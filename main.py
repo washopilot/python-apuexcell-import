@@ -26,9 +26,10 @@ listingData = ()
 def listingSheet(ws: worksheet.Worksheet):
     _wsData = []
 
-    for row in ws.iter_rows():
+    for row in ws.iter_rows(min_col=2,max_col=10):
         _row = tuple(
-            cell.value for cell in row if cell.value is not None and cell.value != '' and cell.column_letter < 'K')
+            cell.value for cell in row)
+        # print(_row, len(_row))
 
         if _row:
             _wsData.append(_row)
@@ -41,10 +42,10 @@ def obt_tpl_ent_etq(lst, etq_ini, etq_fin):
     entre_etiq = False
 
     for tpl in lst:
-        if tpl == (etq_ini,):
+        if etq_ini in tpl:
             entre_etiq = True
             temp_res = []
-        elif tpl == (etq_fin,):
+        elif etq_fin in tpl:
             entre_etiq = False
             if temp_res:
                 res.extend(temp_res)
@@ -60,26 +61,21 @@ def obt_tpl_ent_etq(lst, etq_ini, etq_fin):
 
 
 for sheet in wb.sheetnames:
-    # print()
-    # print(sheet)
-    # print(listingSheet(wb[sheet]))
-    insumos = obt_tpl_ent_etq(listingSheet(
-        wb[sheet]), 'EQUIPOS', 'MANO DE OBRA')
-    # if insumos == []:
-    #     continue
+    detailedSheet = listingSheet(wb[sheet])
+    # print(detailedSheet)
+    insumos = obt_tpl_ent_etq(detailedSheet, 'EQUIPOS', 'MANO DE OBRA')
     # print(insumos)
     for tupla in insumos:
         # print(tupla)
         if not ('Herramienta menor (5% M.O.)' in tupla or 'Seguridad industrial e Higiene Laboral (2% M.O)' in tupla):
-            tupla_resultante = (tupla[0], tupla[2],)
-            # print('aqui estoy en el if')
+            tupla_resultante = (tupla[0], tupla[5],)
         else:
-            # print('aqui estoy en el else')
             tupla_resultante = (tupla[0],)
-        # tupla_resultante = tuple((tupla[0], tupla[2])
-        #                          for tupla in insumos if (tupla[0] != 'Herramienta menor (5% M.O.)' or tupla[0] != 'Seguridad industrial e Higiene Laboral (2% M.O)'))
-        # print(tupla_resultante)
-        listingData += (tupla_resultante,)
+        if all(elemento == None for elemento in tupla_resultante) or all(elemento == '' for elemento in tupla_resultante) or tuple(set(tupla_resultante)) == ('', None):
+            continue
+        else:
+            # print(tupla_resultante)
+            listingData += (tupla_resultante,)
 
 
 print()
@@ -102,7 +98,7 @@ libro_excel = Workbook()
 hoja_activa = libro_excel.active
 
 # Escribir datos en la hoja
-for fila_datos in sorted(listingDataFilter):
+for fila_datos in listingDataFilter:
     hoja_activa.append(fila_datos)
 
 # Guardar el libro de Excel
