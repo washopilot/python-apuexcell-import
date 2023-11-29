@@ -8,82 +8,75 @@ tcpu0 = time.time()
 
 wb = load_workbook(filename='original.xlsx', read_only=True, data_only=True)
 
-listingData = ()
-# ws = wb['1']
+listingData = []
 
+# Rutina para listar filas de una hoja del libro excel
 
-# for idx, row in enumerate(ws.rows, 1):
-#     _row = [idx]
-
-#     for cell in row:
-#         if cell.value:
-#             _row.append(cell.value)
-
-#     if _row != [idx]:
-#         data.append(_row)
-#         print(_row)
 
 def listingSheet(ws: worksheet.Worksheet):
     _wsData = []
 
-    for row in ws.iter_rows(min_col=2,max_col=10):
+    for row in ws.iter_rows(min_col=2, max_col=10):
         _row = tuple(
             cell.value for cell in row)
-        # print(_row, len(_row))
 
         if _row:
             _wsData.append(_row)
 
     return _wsData
 
+# Rutina para listar filas entre etiquetas
 
-def obt_tpl_ent_etq(lst, etq_ini, etq_fin):
-    res = []
-    entre_etiq = False
+
+def get_tuples_between_tags(lst, start_tag, end_tag):
+    result = []
+    inside_tag = False
 
     for tpl in lst:
-        if etq_ini in tpl:
-            entre_etiq = True
-            temp_res = []
-        elif etq_fin in tpl:
-            entre_etiq = False
-            if temp_res:
-                res.extend(temp_res)
-        elif entre_etiq:
-            temp_res.append(tpl)
+        if start_tag in tpl:
+            inside_tag = True
+            temp_result = []
+        elif end_tag in tpl:
+            inside_tag = False
+            if temp_result:
+                result.extend(temp_result)
+        elif inside_tag:
+            temp_result.append(tpl)
 
     # Eliminar el primer y último elemento de la lista resultante
-    if len(res) >= 2:
-        res.pop(0)
-        res.pop(-1)
+    if len(result) >= 2:
+        result.pop(0)
+        result.pop(-1)
 
-    return res
+    return result
 
 
+# Bucle principal
 for sheet in wb.sheetnames:
     detailedSheet = listingSheet(wb[sheet])
-    # print(detailedSheet)
-    insumos = obt_tpl_ent_etq(detailedSheet, 'EQUIPOS', 'MANO DE OBRA')
-    # print(insumos)
-    for tupla in insumos:
-        # print(tupla)
-        if not ('Herramienta menor (5% M.O.)' in tupla or 'Seguridad industrial e Higiene Laboral (2% M.O)' in tupla):
-            tupla_resultante = (tupla[0], tupla[5],)
-        else:
-            tupla_resultante = (tupla[0],)
-        if all(elemento == None for elemento in tupla_resultante) or all(elemento == '' for elemento in tupla_resultante) or tuple(set(tupla_resultante)) == ('', None):
-            continue
-        else:
-            # print(tupla_resultante)
-            listingData += (tupla_resultante,)
+    inputs = get_tuples_between_tags(detailedSheet, 'EQUIPOS', 'MANO DE OBRA')
 
+    # Limpia las tuplas y añade a listingData
+    for tpl in inputs:
+        conditions_to_exclude = [
+            'Herramienta menor (5% M.O.)', 'Seguridad industrial e Higiene Laboral (2% M.O)']
 
+        if any(condition in tpl for condition in conditions_to_exclude):
+            resulting_tuple = (tpl[0],)
+        else:
+            resulting_tuple = (tpl[0], tpl[5])
+
+        if any(element not in (None, '') for element in resulting_tuple):
+            listingData.append(resulting_tuple)
+
+# Imprime la lista listingData
 print()
 print(len(listingData))
 print(listingData)
 
+# Filtra la lista listingData de repetidos
 print()
-listingDataFilter = tuple(set(listingData))
+listingDataFilter = list(set(listingData))
 print(len(listingDataFilter))
 print(listingDataFilter)
 print(tabulate(listingDataFilter))
@@ -94,17 +87,17 @@ wb.close()
 
 
 # Crear un nuevo libro de Excel y obtener la hoja activa
-libro_excel = Workbook()
-hoja_activa = libro_excel.active
+excel_book = Workbook()
+active_sheet = excel_book.active
 
 # Escribir datos en la hoja
-for fila_datos in listingDataFilter:
-    hoja_activa.append(fila_datos)
+for row_data in listingDataFilter:
+    active_sheet.append(row_data)
 
 # Guardar el libro de Excel
-libro_excel.save("output.xlsx")
+excel_book.save("output.xlsx")
 
 print("Se ha creado el archivo Excel: output.xlsx")
 
 
-print('Terminado en: ', (time.time()-tcpu0), 'segundos')
+print('Finalizado en: ', (time.time()-tcpu0), 'segundos')
