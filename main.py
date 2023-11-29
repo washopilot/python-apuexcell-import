@@ -63,20 +63,28 @@ for sheet in wb.sheetnames:
     # print()
     # print(sheet)
     # print(listingSheet(wb[sheet]))
-    materiales = obt_tpl_ent_etq(listingSheet(
-        wb[sheet]), 'MATERIALES', 'TRANSPORTE')
-    if materiales == []:
-        continue
-    # print(materiales)
-    tupla_resultante = tuple((tupla[0], tupla[1], tupla[3])
-                             for tupla in materiales)
-    # print(tupla_resultante)
-    listingData += tupla_resultante
+    insumos = obt_tpl_ent_etq(listingSheet(
+        wb[sheet]), 'EQUIPOS', 'MANO DE OBRA')
+    # if insumos == []:
+    #     continue
+    # print(insumos)
+    for tupla in insumos:
+        # print(tupla)
+        if not ('Herramienta menor (5% M.O.)' in tupla or 'Seguridad industrial e Higiene Laboral (2% M.O)' in tupla):
+            tupla_resultante = (tupla[0], tupla[2],)
+            # print('aqui estoy en el if')
+        else:
+            # print('aqui estoy en el else')
+            tupla_resultante = (tupla[0],)
+        # tupla_resultante = tuple((tupla[0], tupla[2])
+        #                          for tupla in insumos if (tupla[0] != 'Herramienta menor (5% M.O.)' or tupla[0] != 'Seguridad industrial e Higiene Laboral (2% M.O)'))
+        # print(tupla_resultante)
+        listingData += (tupla_resultante,)
 
 
-# print()
-# print(len(listingData))
-# print(listingData)
+print()
+print(len(listingData))
+print(listingData)
 
 print()
 listingDataFilter = tuple(set(listingData))
@@ -94,7 +102,7 @@ libro_excel = Workbook()
 hoja_activa = libro_excel.active
 
 # Escribir datos en la hoja
-for fila_datos in listingDataFilter:
+for fila_datos in sorted(listingDataFilter):
     hoja_activa.append(fila_datos)
 
 # Guardar el libro de Excel
