@@ -1,2 +1,5 @@
 .venv/
 output.xlsx
+*lock*
+__pycache__/
+*.pyc
