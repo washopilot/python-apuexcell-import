@@ -1,6 +1,6 @@
 import time
 
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 from tabulate import tabulate
 
 from helpers import clean_list_tuples, get_tuples_between_tags, listingSheet
@@ -28,9 +28,9 @@ for sheet in wb.sheetnames:
         detailedSheet, 'MATERIALES', 'TRANSPORTE', True), (0, 5, 7))
 
 # Limpieza de repetidos y ordenamiento
-clean_equipment_list = list(enumerate(sorted(set(equipment_list)), 1))
-clean_labour_list = list(enumerate(sorted(set(labour_list)), 1))
-clean_materials_list = list(enumerate(sorted(set(materials_list)), 1))
+clean_equipment_list = list(enumerate(sorted(set(equipment_list)), 10))
+clean_labour_list = list(enumerate(sorted(set(labour_list)), 10))
+clean_materials_list = list(enumerate(sorted(set(materials_list)), 100))
 
 print(tabulate(clean_equipment_list))
 print(tabulate(clean_labour_list))
@@ -40,18 +40,25 @@ print(tabulate(clean_materials_list))
 wb.close()
 
 
-# # Crear un nuevo libro de Excel y obtener la hoja activa
-# excel_book = Workbook()
-# active_sheet = excel_book.active
+# Crear un nuevo libro de Excel y EXPORTA los resultados
+excel_book = Workbook()
+excel_book.remove(excel_book['Sheet'])
+_active_sheet = excel_book.create_sheet(title='EQUIPOS')
+for row_data in clean_equipment_list:
+    _active_sheet.append((row_data[0], *row_data[1]))
 
-# # Escribir datos en la hoja
-# for row_data in listingDataFilter:
-#     active_sheet.append(row_data)
+_active_sheet = excel_book.create_sheet(title='MANO DE OBRA')
+for row_data in clean_labour_list:
+    _active_sheet.append((row_data[0], *row_data[1]))
 
-# # Guardar el libro de Excel
-# excel_book.save("output.xlsx")
+_active_sheet = excel_book.create_sheet(title='MATERIALES')
+for row_data in clean_materials_list:
+    _active_sheet.append((row_data[0], *row_data[1]))
 
-# print("Se ha creado el archivo Excel: output.xlsx")
+# Guardar el libro de Excel
+excel_book.save("output.xlsx")
+
+print("Se ha creado el archivo Excel: output.xlsx")
 
 
 print('Finalizado en: ', (time.time()-tcpu0), 'segundos')
