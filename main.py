@@ -9,36 +9,32 @@ tcpu0 = time.time()
 
 wb = load_workbook(filename='original.xlsx', read_only=True, data_only=True)
 
-listingData = []
+# Inicialización de data
+listing_data = []
+equipment_list = labour_list = materials_list = []
 
+# Bucle busqueda y limpieza de insumos
+for sheet in wb.sheetnames:
+    if sheet == 'Rubros':
+        continue
 
-# # Bucle principal
-# for sheet in wb.sheetnames:
-#     detailedSheet = listingSheet(wb[sheet])
-#     inputs = get_tuples_between_tags(
-#         detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True)
+    detailedSheet = listingSheet(wb[sheet])
 
-#     print(inputs)
+    equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
+        detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True), (0, 5))
+    labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
+        detailedSheet, 'MANO DE OBRA', 'MATERIALES', True), (0, 5))
+    materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
+        detailedSheet, 'MATERIALES', 'TRANSPORTE', True), (0, 5, 7))
 
-detailedSheet = listingSheet(wb['1'])
-supplies_list = get_tuples_between_tags(
-    detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True)
-clean_supplies_list = clean_list_tuples(supplies_list, (0, 5))
-print(clean_supplies_list)
+# Limpieza de repetidos y ordenamiento
+clean_equipment_list = list(enumerate(sorted(set(equipment_list)), 1))
+clean_labour_list = list(enumerate(sorted(set(labour_list)), 1))
+clean_materials_list = list(enumerate(sorted(set(materials_list)), 1))
 
-
-# # Imprime la lista listingData
-# print()
-# print(len(listingData))
-# print(listingData)
-
-# # Filtra la lista listingData de repetidos
-# print()
-# listingDataFilter = list(set(listingData))
-# print(len(listingDataFilter))
-# print(listingDataFilter)
-# print(tabulate(listingDataFilter))
-
+print(tabulate(clean_equipment_list))
+print(tabulate(clean_labour_list))
+print(tabulate(clean_materials_list))
 
 # Close the workbook after reading
 wb.close()
