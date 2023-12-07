@@ -1,27 +1,20 @@
-def obt_tpl_ent_etq(lst, etq_ini, etq_fin):
-    res = []
-    entre_etiq = False
+# Diccionario de tuplas
+dictionary = {1: ('a', 'b'), 2: ('c', 'd'), 3: ('e', 'f')}
 
-    for tpl in lst:
-        if tpl == (etq_ini,):
-            entre_etiq = True
-            temp_res = []
-        elif tpl == (etq_fin,):
-            entre_etiq = False
-            if temp_res:
-                res.extend(temp_res)
+# Lista de tuplas con más de dos elementos
+tuple_list = [('a', 'b', 'x'), ('c', 'd', 'z'), ('e', 'f', 'g', 'h')]
 
-    # Eliminar el primer y último elemento de la lista resultante
-    if len(res) >= 2:
-        res.pop(0)
-        res.pop(-1)
+# Resultado deseado: [(1, 'b', 'x'), (2, 'd', 'z')]
+result = []
 
-    return tuple(res)
+# Iterar sobre la lista de tuplas
+for tuple_list_item in tuple_list:
+    # Buscar la tupla en el diccionario
+    for key, tuple_dictionary in dictionary.items():
+        # Verificar si la tupla del diccionario está incluida en la tupla de la lista
+        if all(element in tuple_list_item for element in tuple_dictionary):
+            # Reemplazar el primer elemento con la clave
+            result.append((key,) + tuple_list_item[1:])
+            break  # Salir del bucle interno si se encuentra la correspondencia
 
-
-# Ejemplo de uso
-lst_tpls = [('etiqueta1',), ('a', 'b'), ('a', 'b'), ('a', 'b'),
-            ('etiqueta2',), ('a', 'b'), ('a', 'b'), ('etiqueta3',)]
-res = obt_tpl_ent_etq(lst_tpls, 'etiqueta1', 'etiqueta2')
-
-print(res)
+print(result)

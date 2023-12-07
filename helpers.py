@@ -71,14 +71,41 @@ def clean_list_tuples(lst: list, cols: tuple):
     result = []
 
     for _tpl in lst:
-        _conditions_to_exclude = [
-            'Herramienta menor (5% M.O.)', 'Seguridad industrial e Higiene Laboral (2% M.O)']
-        if any(condition in _tpl for condition in _conditions_to_exclude):
-            _resulting_tuple = (_tpl[cols[0]],)
-        else:
-            _resulting_tuple = tuple(_tpl[i] for i in cols)
+        # _conditions_to_exclude = [
+        #     'Herramienta menor (5% M.O.)', 'Seguridad industrial e Higiene Laboral (2% M.O)']
+        # if any(condition in _tpl for condition in _conditions_to_exclude):
+        #     _resulting_tuple = (_tpl[cols[0]],)
+        # else:
+        _resulting_tuple = tuple(_tpl[i] for i in cols)
 
         if any(element not in (None, '') for element in _resulting_tuple):
             result.append(_resulting_tuple)
+
+    return result
+
+
+def transform_tuples(dictionary, tuple_list):
+    """
+    Transforma una lista de tuplas reemplazando el primer elemento con la clave del diccionario
+    si la tupla del diccionario está incluida en la tupla de la lista.
+
+    Args:
+    - dictionary: Diccionario de tuplas.
+    - tuple_list: Lista de tuplas con más de dos elementos.
+
+    Returns:
+    - Lista de tuplas transformada.
+    """
+    result = []
+
+    # Iterar sobre la lista de tuplas
+    for tuple_list_item in tuple_list:
+        # Buscar la tupla en el diccionario
+        for key, tuple_dictionary in dictionary.items():
+            # Verificar si la tupla del diccionario está incluida en la tupla de la lista
+            if all(element in tuple_list_item for element in tuple_dictionary):
+                # Reemplazar el primer elemento con la clave
+                result.append((key,) + tuple_list_item[1:])
+                break  # Salir del bucle interno si se encuentra la correspondencia
 
     return result
