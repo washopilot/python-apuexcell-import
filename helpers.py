@@ -86,7 +86,7 @@ def clean_list_tuples(lst: list, cols: tuple):
 
 def transform_tuples(dictionary, tuple_list):
     """
-    Transforma una lista de tuplas reemplazando el primer elemento con la clave del diccionario
+    Transforma una lista de tuplas reemplazando todos los elementos con la clave del diccionario
     si la tupla del diccionario está incluida en la tupla de la lista.
 
     Args:
@@ -104,8 +104,12 @@ def transform_tuples(dictionary, tuple_list):
         for key, tuple_dictionary in dictionary.items():
             # Verificar si la tupla del diccionario está incluida en la tupla de la lista
             if all(element in tuple_list_item for element in tuple_dictionary):
-                # Reemplazar el primer elemento con la clave
-                result.append((key,) + tuple_list_item[1:])
+                # Construir la nueva tupla secuencialmente
+                new_tuple = (key,)
+                for element in tuple_list_item:
+                    if element not in tuple_dictionary:
+                        new_tuple += (element,)
+                result.append(new_tuple)
                 break  # Salir del bucle interno si se encuentra la correspondencia
 
     return result

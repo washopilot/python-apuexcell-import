@@ -31,13 +31,16 @@ for sheet in wb.sheetnames:
 clean_equipment_dict = {index: value for index,
                         value in enumerate(sorted(set(equipment_list)), 1)}
 clean_labour_dict = {index: value for index,
-                     value in enumerate(sorted(set(labour_list)), 1)}
+                        value in enumerate(sorted(set(labour_list)), 1)}
 clean_materials_dict = {index: value for index,
                         value in enumerate(sorted(set(materials_list)), 1)}
 
-# print(clean_equipment_dict)
-# print(clean_labour_dict)
-# print(clean_materials_dict)
+print(tabulate(clean_equipment_dict.items()))
+print()
+print(tabulate(clean_labour_dict.items()))
+print()
+print(tabulate(clean_materials_dict.items()))
+print()
 
 # Segunda vuelta de rubros
 for sheet in wb.sheetnames:
@@ -47,7 +50,7 @@ for sheet in wb.sheetnames:
     detailedSheet = listingSheet(wb[sheet])
 
     equipment_list = clean_list_tuples(get_tuples_between_tags(
-        detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True), (0, 5))
+        detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True), (0, 4, 5))
     new_equipment_list = transform_tuples(clean_equipment_dict, equipment_list)
 
     labour_list = clean_list_tuples(get_tuples_between_tags(
@@ -60,7 +63,7 @@ for sheet in wb.sheetnames:
 
     listing_data.append({'SHEET': sheet,
                         'EQUIPO': new_equipment_list,
-                         'MANO DE OBRA': new_labour_list, 'MATERIALES': new_materials_list})
+                        'MANO DE OBRA': new_labour_list, 'MATERIALES': new_materials_list})
 
 print(listing_data)
 # Close the workbook after reading
