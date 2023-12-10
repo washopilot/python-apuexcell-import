@@ -1,6 +1,6 @@
 import time
 
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook, load_workbook, utils
 from tabulate import tabulate
 
 from helpers import clean_list_tuples, get_tuples_between_tags, listingSheet, transform_tuples
@@ -33,7 +33,7 @@ clean_equipment_dict = {index: value for index,
 clean_labour_dict = {index: value for index,
                      value in enumerate(sorted(set(labour_list)), 532)}
 clean_materials_dict = {index: value for index,
-                        value in enumerate(sorted(set(materials_list)), 326)}
+                        value in enumerate(sorted(set(materials_list)), 3226)}
 
 # print(tabulate(clean_equipment_dict.items()))
 # print()
@@ -81,25 +81,75 @@ print(dict_data[3239])
 wb.close()
 
 
-# # Crear un nuevo libro de Excel y EXPORTA los resultados
-# excel_book = Workbook()
-# excel_book.remove(excel_book['Sheet'])
-# _active_sheet = excel_book.create_sheet(title='EQUIPOS')
-# for row_data in clean_equipment_dict.items():
-#     _active_sheet.append((row_data[0], *row_data[1]))
+# Crear un nuevo libro de Excel y EXPORTA los resultados
+excel_book = Workbook()
+excel_book.remove(excel_book['Sheet'])
+_active_sheet = excel_book.create_sheet(title='EQUIPOS')
+for index, value in enumerate(clean_equipment_dict.items(), start=1):
+    _active_sheet[f'A{index}'] = value[0]
+    _active_sheet[f'B{index}'] = value[1][0]
+    _active_sheet[f'D{index}'] = value[1][1]
 
-# _active_sheet = excel_book.create_sheet(title='MANO DE OBRA')
-# for row_data in clean_labour_dict.items():
-#     _active_sheet.append((row_data[0], *row_data[1]))
 
-# _active_sheet = excel_book.create_sheet(title='MATERIALES')
-# for row_data in clean_materials_dict.items():
-#     _active_sheet.append((row_data[0], *row_data[1]))
+_active_sheet = excel_book.create_sheet(title='MANO DE OBRA')
+for index, value in enumerate(clean_labour_dict.items(), start=1):
+    _active_sheet[f'H{index}'] = value[0]
+    _active_sheet[f'I{index}'] = value[1][0]
+    _active_sheet[f'AC{index}'] = value[1][1]
 
-# # Guardar el libro de Excel
-# excel_book.save("output.xlsx")
+_active_sheet = excel_book.create_sheet(title='MATERIALES')
+for index, value in enumerate(clean_materials_dict.items(), start=1):
+    _active_sheet[f'A{index}'] = value[0]
+    _active_sheet[f'B{index}'] = value[1][0]
+    _active_sheet[f'C{index}'] = value[1][1]
+    _active_sheet[f'D{index}'] = value[1][2]
 
-# print("Se ha creado el archivo Excel: output.xlsx")
+_active_sheet = excel_book.create_sheet(title='RUBROS')
+for index, value in enumerate(dict_data.items(), start=1):
+    print(value[1])
+    _active_sheet[f'A{index}'] = value[0]
+    _active_sheet[f'E{index}'] = value[1]['RUBRO']
+    _active_sheet[f'F{index}'] = value[1]['ITEM']
+    _active_sheet[f'G{index}'] = value[1]['UNIDAD']
+    _active_sheet[f'H{index}'] = 1
+
+    for _i, item in enumerate(value[1]['MATERIALES'], start=1):
+        _col_start = 9
+        _col_step = 2
+        if _i > 20:
+            break
+        try:
+            _active_sheet[f'{utils.get_column_letter(_col_start+(_i-1)*_col_step)}{index}'] = item[0]
+            _active_sheet[f'{utils.get_column_letter(_col_start+(_i-1)*_col_step+1)}{index}'] = item[1]
+        except IndexError:
+            continue
+
+    for _i, item in enumerate(value[1]['MANO DE OBRA'], start=1):
+        _col_start = 49
+        _col_step = 2
+        if _i > 20:
+            break
+        try:
+            _active_sheet[f'{utils.get_column_letter(_col_start+(_i-1)*_col_step)}{index}'] = item[0]
+            _active_sheet[f'{utils.get_column_letter(_col_start+(_i-1)*_col_step+1)}{index}'] = item[1]
+        except IndexError:
+            continue
+
+    for _i, item in enumerate(value[1]['EQUIPO'], start=1):
+        _col_start = 89
+        _col_step = 2
+        if _i > 20:
+            break
+        try:
+            _active_sheet[f'{utils.get_column_letter(_col_start+(_i-1)*_col_step)}{index}'] = item[0]
+            _active_sheet[f'{utils.get_column_letter(_col_start+(_i-1)*_col_step+1)}{index}'] = item[1]
+        except IndexError:
+            continue
+
+# Guardar el libro de Excel
+excel_book.save("output.xlsx")
+
+print("Se ha creado el archivo Excel: output.xlsx")
 
 
 print('Finalizado en: ', (time.time()-tcpu0), 'segundos')
