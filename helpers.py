@@ -1,7 +1,7 @@
 from openpyxl.worksheet.worksheet import Worksheet
 
 
-def listingSheet(ws: Worksheet, min_col=2, max_col=10):
+def listing_sheet(ws: Worksheet, min_col=2, max_col=10):
     """Rutina para listar filas de una hoja del libro de excel
 
     Args:
