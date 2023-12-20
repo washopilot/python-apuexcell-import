@@ -3,3 +3,4 @@ output.xlsx
 *lock*
 __pycache__/
 *.pyc
+output_vae.xlsx
