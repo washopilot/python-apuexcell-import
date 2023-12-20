@@ -71,8 +71,7 @@ def clean_list_tuples(lst: list, cols: tuple):
     result = []
 
     for _tpl in lst:
-        _conditions_to_exclude = [
-            'Herramienta menor (5% M.O.)', 'Seguridad industrial e Higiene Laboral (2% M.O)', 'herramientas menores', 'Herramienta menor', 'Herramientas eléctricas', 'Herramienta liviana' ]
+        _conditions_to_exclude = ['Herramienta Menor (5% de Mano de Obra)', 'herramientas menores', 'Herramienta menor', 'Herramientas eléctricas', 'Herramienta liviana', 'Equipo liviano', 'Herramienta manual y menor de construcción' ]
         if any(condition in _tpl for condition in _conditions_to_exclude):
             _resulting_tuple = (_tpl[cols[0]],)
         else:
