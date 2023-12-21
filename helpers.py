@@ -22,7 +22,7 @@ def listing_sheet(ws: Worksheet, min_col=2, max_col=10):
     return _wsData
 
 
-def get_tuples_between_tags(lst: list, start_tag: str, end_tag: str, delete_first_last=True):
+def get_tuples_between_tags(lst: list, start_tag: str, end_tag: str, delete_first=True, delete_last=True):
     """Rutina para listar filas entre etiquetas
 
     Args:
@@ -50,9 +50,11 @@ def get_tuples_between_tags(lst: list, start_tag: str, end_tag: str, delete_firs
             temp_result.append(tpl)
 
     # Eliminar el primer y último elemento de la lista resultante
-    if len(result) >= 2 and delete_first_last:
-        result.pop(0)
-        result.pop(-1)
+    if len(result) >= 2:
+        if delete_first:
+            result.pop(0)
+        if delete_last:
+            result.pop(-1)
 
     return result
 
