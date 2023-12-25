@@ -2,7 +2,7 @@ import time
 
 import pandas as pd
 
-from helpers import process_sheet
+from helpers import clean_and_sort_dataframe, process_sheet
 
 tcpu0 = time.time()
 
@@ -17,15 +17,12 @@ df_dict_sheets = pd.read_excel(excel_file, sheet_name=[
 df_materials = pd.DataFrame()
 
 for df_sheet in df_dict_sheets.values():
-    _df_temp_process = process_sheet(df_sheet, etiquetas=[
-        'EQUIPOS', 'MANO DE OBRA'])
+    _df_temp_process = process_sheet(df_sheet, labels=[
+        'MATERIALES', 'TRANSPORTE'])
     df_materials = pd.concat(
-        [_df_temp_process[['DESCRIPCIÓN', 'TARIFA']], df_materials], axis=0)
+        [_df_temp_process[['DESCRIPCIÓN', 'UNIDAD', 'COSTO']], df_materials], axis=0)
 
-df_clean_equipment = df_materials.drop_duplicates().dropna(
-    axis=0, how='all').sort_values(by='DESCRIPCIÓN', ascending=True)
-new_index = range(200, 200 + len(df_clean_equipment))
-df_clean_equipment = df_clean_equipment.set_index(pd.Index(new_index))
+df_clean_equipment = clean_and_sort_dataframe(df_materials, start_index=20)
 
 print(df_clean_equipment)
 
