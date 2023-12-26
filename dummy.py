@@ -1,21 +1,46 @@
 import pandas as pd
 
-# DataFrame 1
-data1 = {'Nombre': ['Alice', 'Bob'],
-         'Edad': [25, 30]}
-df1 = pd.DataFrame(data1)
+# Datos organizados por filas
+data_A = [
+    [1, 4, 7],
+    [2, 5, 8],
+    [3, 6, 9]
+]
+column_names_A = ['A', 'B', 'C']
+dfA = pd.DataFrame(data_A, columns=column_names_A)
 
-# DataFrame 2
-data2 = {'Nombre': ['Bob', 'Charlie', 'David'],
-         'Edad': [31, 35, 40]}
-df2 = pd.DataFrame(data2)
+data_B = [
+    [1, 4],
+    [2, 5]
+]
+column_names_B = ['A', 'B']
+# Índices
+indices_B = [20, 21]
+dfB = pd.DataFrame(data_B, columns=column_names_B, index=indices_B)
 
-# Concatenar a lo largo de las filas (axis=0)
-df_concat = pd.concat([df1, df2], axis=0)
+# Especificar los nombres de las columnas en dfC
+column_names_C = ['Z', 'B', 'C']
 
-# Eliminar filas duplicadas basadas en todas las columnas
-df_concat_sin_duplicados = df_concat.drop_duplicates()
+# Crear DataFrame vacío con las columnas especificadas
+dfC = pd.DataFrame(columns=column_names_C)
 
-# Imprimir el DataFrame resultante sin filas duplicadas
-print("DataFrame Concatenado sin Filas Duplicadas:")
-print(df_concat_sin_duplicados.reset_index(drop=True))
+# Iterar sobre las filas de dfA
+for index_A, row_A in dfA.iterrows():
+    # Verificar si la fila de dfA está incluida en alguna fila de dfB
+    matching_rows = dfB[dfB.apply(lambda row_B: row_B.isin(row_A).all(), axis=1)]
+    
+    if not matching_rows.empty:
+        # Tomar el índice de la primera coincidencia
+        index_B = matching_rows.index[0]
+    else:
+        # Si no hay coincidencias, asignar None
+        index_B = None
+
+    # Obtener los valores de las columnas especificadas en column_names_C en dfA
+    values_C = [row_A[column] for column in column_names_C[1:]]
+
+    # Concatenar el resultado a dfC
+    dfC = pd.concat([dfC, pd.DataFrame([[index_B] + values_C], columns=column_names_C)], ignore_index=True)
+
+# Imprimir el resultado
+print(dfC)
