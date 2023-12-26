@@ -1,6 +1,45 @@
 import pandas as pd
 
-# Datos organizados por filas
+
+def merge_dataframes(dfA, dfB, column_names_C):
+    """
+    Merge DataFrames dfA and dfB into a new DataFrame dfC.
+
+    Parameters:
+    - dfA (pd.DataFrame): Source DataFrame with data organized by rows.
+    - dfB (pd.DataFrame): DataFrame to be used for matching with dfA.
+    - column_names_C (list): List containing column names for DataFrame dfC.
+
+    Returns:
+    - pd.DataFrame: Resulting DataFrame that combines information from dfA and dfB based on specified conditions.
+    """
+    # Create an empty DataFrame with specified columns
+    dfC = pd.DataFrame(columns=column_names_C)
+
+    # Iterate over the rows of dfA
+    for index_A, row_A in dfA.iterrows():
+        # Check if the row of dfA is included in any row of dfB
+        matching_rows = dfB[dfB.apply(
+            lambda row_B: row_B.isin(row_A).all(), axis=1)]
+
+        if not matching_rows.empty:
+            # Take the index of the first match
+            index_B = matching_rows.index[0]
+        else:
+            # If no matches, assign None
+            index_B = None
+
+        # Get values of specified columns in column_names_C in dfA
+        values_C = [row_A[col] for col in column_names_C[1:]]
+
+        # Concatenate the result to dfC
+        dfC = pd.concat([dfC, pd.DataFrame(
+            [[index_B] + values_C], columns=column_names_C)], ignore_index=True)
+
+    return dfC
+
+
+# Data organized by rows
 data_A = [
     [1, 4, 7],
     [2, 5, 8],
@@ -14,33 +53,15 @@ data_B = [
     [2, 5]
 ]
 column_names_B = ['A', 'B']
-# Índices
+# Indices
 indices_B = [20, 21]
 dfB = pd.DataFrame(data_B, columns=column_names_B, index=indices_B)
 
-# Especificar los nombres de las columnas en dfC
+# Define the desired columns in dfC
 column_names_C = ['Z', 'B', 'C']
 
-# Crear DataFrame vacío con las columnas especificadas
-dfC = pd.DataFrame(columns=column_names_C)
+# Call the function
+dfC = merge_dataframes(dfA, dfB, column_names_C)
 
-# Iterar sobre las filas de dfA
-for index_A, row_A in dfA.iterrows():
-    # Verificar si la fila de dfA está incluida en alguna fila de dfB
-    matching_rows = dfB[dfB.apply(lambda row_B: row_B.isin(row_A).all(), axis=1)]
-    
-    if not matching_rows.empty:
-        # Tomar el índice de la primera coincidencia
-        index_B = matching_rows.index[0]
-    else:
-        # Si no hay coincidencias, asignar None
-        index_B = None
-
-    # Obtener los valores de las columnas especificadas en column_names_C en dfA
-    values_C = [row_A[column] for column in column_names_C[1:]]
-
-    # Concatenar el resultado a dfC
-    dfC = pd.concat([dfC, pd.DataFrame([[index_B] + values_C], columns=column_names_C)], ignore_index=True)
-
-# Imprimir el resultado
+# Print the result
 print(dfC)

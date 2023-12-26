@@ -2,7 +2,7 @@ import time
 
 import pandas as pd
 
-from helpers import clean_and_sort_dataframe, process_sheet
+from helpers import clean_and_sort_dataframe, merge_dataframes, process_sheet
 
 tcpu0 = time.time()
 
@@ -34,26 +34,7 @@ print()
 print(df_Sheet_1)
 print()
 
-column_names_C = ['CODIGO', 'CANTIDAD']
-dfC = pd.DataFrame(columns=column_names_C)
-
-# Iterar sobre las filas de dfA
-for index_A, row_A in df_Sheet_1.iterrows():
-    # Verificar si la fila de dfA está incluida en alguna fila de dfB
-    matching_rows = df_clean_equipment[df_clean_equipment.apply(lambda row_B: row_B.isin(row_A).all(), axis=1)]
-    
-    if not matching_rows.empty:
-        # Tomar el índice de la primera coincidencia
-        index_B = matching_rows.index[0]
-    else:
-        # Si no hay coincidencias, asignar None
-        index_B = None
-
-    # Obtener los valores de las columnas especificadas en column_names_C en dfA
-    values_C = [row_A[column] for column in column_names_C[1:]]
-
-    # Concatenar el resultado a dfC
-    dfC = pd.concat([dfC, pd.DataFrame([[index_B] + values_C], columns=column_names_C)], ignore_index=True)
+dfC = merge_dataframes(df_Sheet_1, df_clean_equipment, ['CODIGO', 'CANTIDAD'])
 
 print(dfC)
 print()
