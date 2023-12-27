@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def process_sheet(sheet_data, labels=['EQUIPO', 'MANO DE OBRA']):
+def process_sheet_between_tags(sheet_data, labels=['EQUIPO', 'MANO DE OBRA']):
     """
     This function processes a given worksheet data and returns a subset of the data based on the provided tags.
 
