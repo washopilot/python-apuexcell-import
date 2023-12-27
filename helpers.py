@@ -1,5 +1,5 @@
+import numpy as np
 import pandas as pd
-from openpyxl.worksheet.worksheet import Worksheet
 
 
 def process_sheet(sheet_data, labels=['EQUIPO', 'MANO DE OBRA']):
@@ -80,39 +80,39 @@ def clean_and_sort_dataframe(df, column_name='DESCRIPCIÓN', start_index=1):
     return cleaned_df
 
 
-def merge_dataframes(dfA, dfB, column_names_C):
+def merge_dataframes(dfA, dfB, columns_to_show, result_column_name='CODIGO'):
     """
-    Merge DataFrames dfA and dfB into a new DataFrame dfC.
+    Merge two dataframes and add a new column to dfA based on the specified conditions.
 
     Parameters:
-    - dfA (pd.DataFrame): Source DataFrame with data organized by rows.
-    - dfB (pd.DataFrame): DataFrame to be used for matching with dfA.
-    - column_names_C (list): List containing column names for DataFrame dfC.
+    - dfA (pd.DataFrame): The first dataframe.
+    - dfB (pd.DataFrame): The second dataframe.
+    - columns_to_show (list): A list of column names to include in the resulting dataframe.
+    - result_column_name (str): The name of the new column to be added to dfA.
 
     Returns:
-    - pd.DataFrame: Resulting DataFrame that combines information from dfA and dfB based on specified conditions.
+    pd.DataFrame: A new dataframe with specified columns showing the merged data.
     """
-    # Create an empty DataFrame with specified columns
-    dfC = pd.DataFrame(columns=column_names_C)
 
-    # Iterate over the rows of dfA
-    for index_A, row_A in dfA.iterrows():
-        # Check if the row of dfA is included in any row of dfB
-        matching_rows = dfB[dfB.apply(
-            lambda row_B: row_B.isin(row_A).all(), axis=1)]
+    # Create a new DataFrame dfC based on dfA
+    dfC = dfA.copy()
 
-        if not matching_rows.empty:
-            # Take the index of the first match
-            index_B = matching_rows.index[0]
-        else:
-            # If no matches, assign None
-            index_B = None
+    # Add a new column initialized with NaN
+    dfC[result_column_name] = np.nan
 
-        # Get values of specified columns in column_names_C in dfA
-        values_C = [row_A[col] for col in column_names_C[1:]]
+    # Iterate over the rows of dfC and check the conditions
+    for idx, row in dfC.iterrows():
+        # Check if any row of dfB is included in the current row of dfA
+        matching_indices = dfB.index[dfB.isin(row.values).all(axis=1)].tolist()
 
-        # Concatenate the result to dfC
-        dfC = pd.concat([dfC, pd.DataFrame(
-            [[index_B] + values_C], columns=column_names_C)], ignore_index=True)
+        if matching_indices:
+            # If there are matches, assign the first found index to the new column
+            dfC.at[idx, result_column_name] = matching_indices[0]
 
-    return dfC
+    # Preserve the original indices of dfA in dfC
+    dfC.index = dfA.index
+
+    # Select only the specified columns
+    dfC_filtered = dfC[columns_to_show]
+
+    return dfC_filtered

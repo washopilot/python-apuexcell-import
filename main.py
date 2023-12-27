@@ -34,7 +34,7 @@ print()
 print(df_Sheet_1)
 print()
 
-dfC = merge_dataframes(df_Sheet_1, df_clean_equipment, ['CODIGO', 'CANTIDAD'])
+dfC = merge_dataframes(df_Sheet_1, df_clean_equipment, ['CODIGO', 'CANTIDAD'], result_column_name='CODIGO')
 
 print(dfC)
 print()
