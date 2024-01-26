@@ -33,19 +33,22 @@ for df_name, df_sheet in df_dict_sheets.items():
     df_materials = pd.concat(
         [_df_temp[['DESCRIPCIÓN', 'UNIDAD', 'P. UNITARIO']], df_materials], axis=0)
 
-df_clean_equipment = clean_and_sort_dataframe(df_equipment, start_index=1)
-df_clean_labour = clean_and_sort_dataframe(df_labour, start_index=1)
-df_clean_materials = clean_and_sort_dataframe(df_materials, start_index=1)
+df_clean_equipment = clean_and_sort_dataframe(df_equipment, start_index=100)
+df_clean_labour = clean_and_sort_dataframe(df_labour, start_index=200)
+df_clean_materials = clean_and_sort_dataframe(df_materials, start_index=300)
 
 print(df_clean_equipment)
 print(df_clean_labour)
 print(df_clean_materials)
 
 
-df_sheet_test = process_sheet_between_tags(df_dict_sheets['10'], labels=[
-    'MATERIALES', 'TRANSPORTE'])
+df_sheet_test = process_sheet_between_tags(df_dict_sheets['1'], labels=[
+    'EQUIPOS', 'MANO DE OBRA'])
 
 dfC = merge_dataframes(df_sheet_test, df_clean_equipment, [
-                       'Z', 'CANTIDAD'], result_column_name='Z')
+                       'Z', 'DESCRIPCIÓN', 'CANTIDAD'], result_column_name='Z')
+
+print(df_sheet_test)
+print(dfC)
 
 print('Finalizado en: ', (time.time()-tcpu0), 'segundos')
