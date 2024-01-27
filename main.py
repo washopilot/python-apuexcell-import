@@ -1,6 +1,7 @@
 import time
 
 import pandas as pd
+from tqdm import tqdm
 
 from helpers import (clean_and_sort_dataframe, merge_dataframes,
                      process_sheet_between_tags)
@@ -17,7 +18,10 @@ df_dict_sheets = pd.read_excel(excel_file, sheet_name=[
 # Initialize lists to store temporary data
 equipment_data, labour_data, materials_data = [], [], []
 
-for df_sheet in df_dict_sheets.values():
+# Use tqdm to add a progress bar to the for loop
+for sheet_name in tqdm(df_dict_sheets.keys(), desc="Processing Sheets"):
+    df_sheet = df_dict_sheets[sheet_name]
+
     # Process and store data in lists instead of repeatedly concatenating DataFrames
     equipment_data.append(process_sheet_between_tags(df_sheet, labels=['EQUIPOS', 'MANO DE OBRA'])
                           [['DESCRIPCIÓN', 'TARIFA']])
