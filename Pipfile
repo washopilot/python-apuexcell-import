@@ -7,6 +7,7 @@ name = "pypi"
 pandas = "*"
 openpyxl = "*"
 tqdm = "*"
+pyarrow = "*"
 
 [dev-packages]
 
