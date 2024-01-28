@@ -114,5 +114,8 @@ def merge_dataframes(dfA, dfB, columns_to_show, result_column_name='CODIGO'):
 
     # Select only the specified columns
     dfC_filtered = dfC[columns_to_show]
+    
+    # Ensure that the result_column_name contains only integers or NaN
+    dfC_filtered[result_column_name] = pd.to_numeric(dfC_filtered[result_column_name], errors='coerce').astype('Int64')
 
     return dfC_filtered
