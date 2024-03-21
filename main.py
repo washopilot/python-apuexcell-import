@@ -1,8 +1,6 @@
 import time
-
 import pandas as pd
 from tqdm import tqdm
-
 from helpers import (clean_and_sort_dataframe, merge_dataframes,
                      process_sheet_between_tags)
 
@@ -11,42 +9,26 @@ def main():
     tcpu0 = time.time()
     excel_file = 'original.xlsx'
 
-    _sheet_names = pd.ExcelFile(excel_file).sheet_names
+    # Leer el archivo Excel y obtener el nombre de las hojas y los datos de cada hoja en una sola lectura
+    with pd.ExcelFile(excel_file) as xls:
+        sheet_names = xls.sheet_names
+        df_dict_sheets = {}
 
-    try:
-        df_dict_sheets = pd.read_excel(excel_file, sheet_name=[
-            sheet for sheet in _sheet_names], index_col=None, header=None, nrows=65)
-    except pd.errors.ParserError:
-        print(f"Hubo en error de parseo")
+        # Utilizar tqdm para mostrar el progreso
+        for sheet_name in tqdm(sheet_names, desc="Read excel file..."):
+            df_dict_sheets[sheet_name] = pd.read_excel(xls, sheet_name=sheet_name, index_col=None, header=None, nrows=65)
 
-    # Initialize lists to store temporary data
+    # Inicializar listas para almacenar datos temporales
     equipment_data, labour_data, materials_data = [], [], []
 
-    # Use tqdm to add a progress bar to the for loop
-    for sheet_name in tqdm(df_dict_sheets.keys(), desc="Processing Sheets"):
-        df_sheet = df_dict_sheets[sheet_name]
-
-        # Process and store data in lists instead of repeatedly concatenating DataFrames
-        try:
-            equipment_data.append(process_sheet_between_tags(
-                df_sheet, labels=['EQUIPOS', 'MANO DE OBRA'])
-                [['Descripción', 'Tarifa']])
-        except KeyError:
-            pass
-
-        try:
-            labour_data.append(process_sheet_between_tags(
-                df_sheet, labels=['MANO DE OBRA', 'MATERIALES'])
-                [['Descripción', 'Jornal/HR']])
-        except KeyError:
-            pass
-
-        try:
-            materials_data.append(process_sheet_between_tags(
-                df_sheet, labels=['MATERIALES', 'TRANSPORTE'])
-                [['Descripción', 'Unidad', 'Precio Unit.']])
-        except KeyError:
-            pass
+    # Procesar y almacenar datos en listas
+    for sheet_name, df_sheet in tqdm(df_dict_sheets.items(), desc="Processing Sheets"):
+        if 'EQUIPOS' in df_sheet.values and 'MANO DE OBRA' in df_sheet.values:
+            equipment_data.append(process_sheet_between_tags(df_sheet, labels=['EQUIPOS', 'MANO DE OBRA'])[['Descripción', 'Tarifa']])
+        if 'MANO DE OBRA' in df_sheet.values and 'MATERIALES' in df_sheet.values:
+            labour_data.append(process_sheet_between_tags(df_sheet, labels=['MANO DE OBRA', 'MATERIALES'])[['Descripción', 'Jornal/HR']])
+        if 'MATERIALES' in df_sheet.values and 'TRANSPORTE' in df_sheet.values:
+            materials_data.append(process_sheet_between_tags(df_sheet, labels=['MATERIALES', 'TRANSPORTE'])[['Descripción', 'Unidad', 'Precio Unit.']])
 
     # Function to prepare data by concatenating, cleaning, and sorting
     def prepare_data(data_list, start_index):
@@ -63,6 +45,7 @@ def main():
         print('Completed in:', (time.time() - start_time), 'seconds')
 
     # Print DataFrames
+    print("\nPrint results:\n")
     print("df_clean_equipment:\n", df_clean_equipment, "\n")
     print("df_clean_labour:\n", df_clean_labour, "\n")
     print("df_clean_materials:\n", df_clean_materials, "\n")
