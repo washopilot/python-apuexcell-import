@@ -62,6 +62,18 @@ def main():
     print("df_sheet_test:\n", df_sheet_test, "\n")
     print("dfC:\n", dfC, "\n")
 
+    # Crear un escritor de Excel
+    writer = pd.ExcelWriter('output.xlsx', engine='xlsxwriter')
+
+    # Exportar los DataFrames a hojas de Excel
+    print('Write output.xlsx\n')
+    df_clean_equipment.to_excel(writer, sheet_name='Hoja1', index=False)
+    df_clean_labour.to_excel(writer, sheet_name='Hoja2', index=False)
+    df_clean_materials.to_excel(writer, sheet_name='Hoja3', index=False)
+
+    # Guardar el archivo Excel
+    writer._save()
+
     # Print elapsed time
     print_time_elapsed(tcpu0)
 

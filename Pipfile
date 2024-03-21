@@ -8,6 +8,7 @@ pandas = "*"
 openpyxl = "*"
 tqdm = "*"
 pyarrow = "*"
+xlsxwriter = "*"
 
 [dev-packages]
 
