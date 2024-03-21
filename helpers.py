@@ -25,7 +25,7 @@ def process_sheet_between_tags(sheet_data, labels=['EQUIPO', 'MANO DE OBRA']):
 
     """
     # Find the indices of rows using the provided labels
-    label_indices = sheet_data[sheet_data[1].isin(labels)].index
+    label_indices = sheet_data[sheet_data[0].isin(labels)].index
 
     # Check if both labels were found
     if len(label_indices) == 2:
@@ -45,12 +45,11 @@ def process_sheet_between_tags(sheet_data, labels=['EQUIPO', 'MANO DE OBRA']):
         # Assign the new headers to the original DataFrame
         sheet_data.columns = new_headers
 
+        sheet_data.columns.name = None
+        return sheet_data
+
     else:
-        raise ValueError("Both labels not found in the worksheet data.")
-
-    sheet_data.columns.name = None
-    return sheet_data
-
+        return pd.DataFrame()
 
 def clean_and_sort_dataframe(df, column_name='DESCRIPCIÓN', start_index=1):
     """
@@ -110,17 +109,19 @@ def merge_dataframes(dfA, dfB, columns_to_show, result_column_name='CODIGO'):
             dfC.at[idx, result_column_name] = int(matching_indices[0])
 
     # Convert the result_column_name to a numeric type (float)
-    dfC[result_column_name] = pd.to_numeric(dfC[result_column_name], errors='coerce')
+    dfC[result_column_name] = pd.to_numeric(
+        dfC[result_column_name], errors='coerce')
 
     # Fill NaN with a placeholder, and then convert the entire column to int
     placeholder = -1  # Use an arbitrary placeholder for NaN values
-    dfC[result_column_name] = dfC[result_column_name].fillna(placeholder).astype(int)
+    dfC[result_column_name] = dfC[result_column_name].fillna(
+        placeholder).astype(int)
 
     # Replace the placeholder back to NaN
-    dfC[result_column_name] = dfC[result_column_name].replace(placeholder, np.nan)
+    dfC[result_column_name] = dfC[result_column_name].replace(
+        placeholder, np.nan)
 
     # Select only the specified columns
     dfC_filtered = dfC[columns_to_show]
 
     return dfC_filtered
-

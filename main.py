@@ -13,8 +13,11 @@ def main():
 
     _sheet_names = pd.ExcelFile(excel_file).sheet_names
 
-    df_dict_sheets = pd.read_excel(excel_file, sheet_name=[
-        sheet for sheet in _sheet_names if sheet != 'Rubros'], index_col=None, header=None, nrows=65, usecols='B:J')
+    try:
+        df_dict_sheets = pd.read_excel(excel_file, sheet_name=[
+            sheet for sheet in _sheet_names], index_col=None, header=None, nrows=65)
+    except pd.errors.ParserError:
+        print(f"Hubo en error de parseo")
 
     # Initialize lists to store temporary data
     equipment_data, labour_data, materials_data = [], [], []
@@ -24,17 +27,31 @@ def main():
         df_sheet = df_dict_sheets[sheet_name]
 
         # Process and store data in lists instead of repeatedly concatenating DataFrames
-        equipment_data.append(process_sheet_between_tags(df_sheet, labels=['EQUIPOS', 'MANO DE OBRA'])
-                              [['DESCRIPCIÓN', 'TARIFA']])
-        labour_data.append(process_sheet_between_tags(df_sheet, labels=['MANO DE OBRA', 'MATERIALES'])
-                           [['DESCRIPCIÓN', 'JORNAL / HORA']])
-        materials_data.append(process_sheet_between_tags(df_sheet, labels=['MATERIALES', 'TRANSPORTE'])
-                              [['DESCRIPCIÓN', 'UNIDAD', 'P. UNITARIO']])
+        try:
+            equipment_data.append(process_sheet_between_tags(
+                df_sheet, labels=['EQUIPOS', 'MANO DE OBRA'])
+                [['Descripción', 'Tarifa']])
+        except KeyError:
+            pass
+
+        try:
+            labour_data.append(process_sheet_between_tags(
+                df_sheet, labels=['MANO DE OBRA', 'MATERIALES'])
+                [['Descripción', 'Jornal/HR']])
+        except KeyError:
+            pass
+
+        try:
+            materials_data.append(process_sheet_between_tags(
+                df_sheet, labels=['MATERIALES', 'TRANSPORTE'])
+                [['Descripción', 'Unidad', 'Precio Unit.']])
+        except KeyError:
+            pass
 
     # Function to prepare data by concatenating, cleaning, and sorting
     def prepare_data(data_list, start_index):
         df = pd.concat(data_list, axis=0)
-        return clean_and_sort_dataframe(df, start_index=start_index)
+        return clean_and_sort_dataframe(df, column_name='Descripción', start_index=start_index)
 
     # Prepare the equipment data
     df_clean_equipment = prepare_data(equipment_data, 100)
@@ -52,11 +69,11 @@ def main():
 
     # Specific sheet processing
     df_sheet_test = process_sheet_between_tags(
-        df_dict_sheets['1'], labels=['EQUIPOS', 'MANO DE OBRA'])
-    
+        df_dict_sheets['Sheet357'], labels=['EQUIPOS', 'MANO DE OBRA'])
+
     # Merge DataFrames
     dfC = merge_dataframes(df_sheet_test, df_clean_equipment, [
-                           'Z', 'DESCRIPCIÓN', 'CANTIDAD'], result_column_name='Z')
+                           'Z', 'Descripción', 'Cantidad'], result_column_name='Z')
 
     # Print results of processing and merging
     print("df_sheet_test:\n", df_sheet_test, "\n")
