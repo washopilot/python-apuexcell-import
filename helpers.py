@@ -51,6 +51,7 @@ def process_sheet_between_tags(sheet_data, labels=['EQUIPO', 'MANO DE OBRA']):
     else:
         return pd.DataFrame()
 
+
 def clean_and_sort_dataframe(df, column_name='DESCRIPCIÓN', start_index=1):
     """
     Clean and sort a DataFrame by removing duplicates, dropping NaN values,
