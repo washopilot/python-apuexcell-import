@@ -22,11 +22,11 @@ for sheet in wb.sheetnames:
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'Equipo y herramienta', 'Materiales'), (1, 2))
-    labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Materiales', 'Transporte'), (1, 2))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Transporte', 'Mano de Obra'), (1, 2, 4))
+        _detailedSheet, 'Materiales', 'Transporte'), (1, 2))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
+        _detailedSheet, 'Transporte', 'Mano de Obra'), (1, 2, 4))
+    labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', delete_first=True, delete_last=False), (1, 4))
 
     # print(tabulate(equipment_list))
@@ -42,9 +42,9 @@ clean_transport_dict = {index: value for index,
                         value in enumerate(sorted(set(transport_list)), 4000)}
 
 print(tabulate(clean_equipment_dict.items()))
-# print(tabulate(clean_labour_dict.items()))
-# print(tabulate(clean_materials_dict.items()))
-# print(tabulate(clean_transport_dict.items()))
+print(tabulate(clean_labour_dict.items()))
+print(tabulate(clean_materials_dict.items()))
+print(tabulate(clean_transport_dict.items()))
 
 # Segunda vuelta de rubros
 for sheet in wb.sheetnames:
@@ -55,80 +55,80 @@ for sheet in wb.sheetnames:
     # print(_detailedSheet)
 
     _equipment_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Equipo y herramienta', 'Materiales', True), (1, 2, 3))
+        _detailedSheet, 'Equipo y herramienta', 'Materiales', True), (1, 2, 3, 4))
     _new_equipment_list = transform_tuples(
         clean_equipment_dict, _equipment_list)
-    print(tabulate(_equipment_list))
+    # print(tabulate(_equipment_list))
+    # print(tabulate(_new_equipment_list))
+
+    _labour_list = clean_list_tuples(get_tuples_between_tags(
+        _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', True, False), (1, 3, 4))
+    _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
+
+    _materials_list = clean_list_tuples(get_tuples_between_tags(
+        _detailedSheet, 'Materiales', 'Transporte', True), (1, 2, 3, 4))
+    _new_materials_list = transform_tuples(
+        clean_materials_dict, _materials_list)
+
+    _transport_list = clean_list_tuples(get_tuples_between_tags(
+        _detailedSheet, 'Transporte', 'Mano de Obra', True), (1, 2, 3, 4))
+    _new_transport_list = transform_tuples(
+        clean_transport_dict, _transport_list)
+
+    _new_pa = {'SHEET': sheet, 'ITEM': _detailedSheet[2][0].replace('N°:', '').strip(), 'RUBRO': (_detailedSheet[4][0]).replace('Rubro.:', '').strip(), 'UNIDAD': _detailedSheet[6][0].replace(
+        'Unidad:', '').strip(), 'EQUIPO': _new_equipment_list, 'MANO DE OBRA': _new_labour_list, 'MATERIALES': _new_materials_list, 'TRANSPORTE': _new_transport_list}
+    listing_data.append(_new_pa)
 
 
-    # _labour_list = clean_list_tuples(get_tuples_between_tags(
-    #     _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True), (0, 1, 2))
-    # _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
+# Creación del diccionario general de Rubros
+dict_data = {index: value for index, value in enumerate(listing_data, 1000)}
+print(dict_data)
 
-    # _materials_list = clean_list_tuples(get_tuples_between_tags(
-    #     _detailedSheet, 'MATERIALES', 'TRANSPORTE', True), (0, 2, 3, 4))
-    # _new_materials_list = transform_tuples(
-    #     clean_materials_dict, _materials_list)
-
-    # _transport_list = clean_list_tuples(get_tuples_between_tags(
-    #     _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 2, 3, 4))
-    # _new_transport_list = transform_tuples(
-    #     clean_transport_dict, _transport_list)
-
-    # _new_pa = {'SHEET': sheet, 'ITEM': _detailedSheet[8][0], 'RUBRO': (_detailedSheet[4][0]).replace('RUBRO: ', ''), 'UNIDAD': _detailedSheet[6][0].replace(
-    #     'UNIDAD: ', ''), 'EQUIPO': _new_equipment_list, 'MANO DE OBRA': _new_labour_list, 'MATERIALES': _new_materials_list, 'TRANSPORTE': _new_transport_list}
-    # listing_data.append(_new_pa)
+# Close the workbook after reading
+wb.close()
 
 
-# # Creación del diccionario general de Rubros
-# dict_data = {index: value for index, value in enumerate(listing_data, 164)}
-# print(dict_data)
+# Crear un nuevo libro de Excel y EXPORTA los resultados
+excel_book = Workbook()
+excel_book.remove(excel_book['Sheet'])
+_active_sheet = excel_book.create_sheet(title='EQUIPOS')
+for index, value in enumerate(clean_equipment_dict.items(), start=1):
+    try:
+        _active_sheet[f'A{index}'] = value[0]
+        _active_sheet[f'B{index}'] = value[1][0]
+        _active_sheet[f'C{index}'] = value[1][1]
+        # print(index, value)
+    except IndexError:
+        continue
 
-# # Close the workbook after reading
-# wb.close()
+_active_sheet = excel_book.create_sheet(title='MANO DE OBRA')
+for index, value in enumerate(clean_labour_dict.items(), start=1):
+    try:
+        _active_sheet[f'A{index}'] = value[0]
+        _active_sheet[f'B{index}'] = value[1][0]
+        _active_sheet[f'C{index}'] = value[1][1]
+    except IndexError:
+        continue
 
+_active_sheet = excel_book.create_sheet(title='MATERIALES')
+for index, value in enumerate(clean_materials_dict.items(), start=1):
+    try:
+        _active_sheet[f'A{index}'] = value[0]
+        _active_sheet[f'B{index}'] = value[1][0]
+        _active_sheet[f'C{index}'] = value[1][1]
+        _active_sheet[f'D{index}'] = value[1][2]
+    except IndexError:
+        continue
 
-# # Crear un nuevo libro de Excel y EXPORTA los resultados
-# excel_book = Workbook()
-# excel_book.remove(excel_book['Sheet'])
-# _active_sheet = excel_book.create_sheet(title='EQUIPOS')
-# for index, value in enumerate(clean_equipment_dict.items(), start=1):
-#     try:
-#         _active_sheet[f'A{index}'] = value[0]
-#         _active_sheet[f'B{index}'] = value[1][0]
-#         _active_sheet[f'D{index}'] = float(value[1][1])
-#         # print(index, value)
-#     except IndexError:
-#         continue
-
-# _active_sheet = excel_book.create_sheet(title='MANO DE OBRA')
-# for index, value in enumerate(clean_labour_dict.items(), start=1):
-#     try:
-#         _active_sheet[f'H{index}'] = value[0]
-#         _active_sheet[f'I{index}'] = value[1][0]
-#         _active_sheet[f'AC{index}'] = float(value[1][1])
-#     except IndexError:
-#         continue
-
-# _active_sheet = excel_book.create_sheet(title='MATERIALES')
-# for index, value in enumerate(clean_materials_dict.items(), start=1):
-#     try:
-#         _active_sheet[f'A{index}'] = value[0]
-#         _active_sheet[f'B{index}'] = value[1][0]
-#         _active_sheet[f'C{index}'] = value[1][1]
-#         _active_sheet[f'D{index}'] = float(value[1][2])
-#     except IndexError:
-#         continue
-
-# _active_sheet = excel_book.create_sheet(title='TRANSPORTE')
-# for index, value in enumerate(clean_transport_dict.items(), start=1):
-#     try:
-#         _active_sheet[f'A{index}'] = value[0]
-#         _active_sheet[f'B{index}'] = value[1][0]
-#         _active_sheet[f'C{index}'] = value[1][1]
-#         _active_sheet[f'G{index}'] = float(value[1][2])
-#     except IndexError:
-#         continue
+_active_sheet = excel_book.create_sheet(title='TRANSPORTE')
+for index, value in enumerate(clean_transport_dict.items(), start=1):
+    try:
+        _active_sheet[f'A{index}'] = value[0]
+        _active_sheet[f'B{index}'] = value[1][0]
+        _active_sheet[f'C{index}'] = value[1][1]
+        _active_sheet[f'G{index}'] = float(value[1][2])
+    except IndexError:
+        continue
 
 # _active_sheet = excel_book.create_sheet(title='RUBROS')
 # MAX_ITERATIONS = 20
@@ -158,9 +158,9 @@ for sheet in wb.sheetnames:
 #             except IndexError:
 #                 continue
 
-# # Guardar el libro de Excel
-# excel_book.save("output.xlsx")
+# Guardar el libro de Excel
+excel_book.save("output.xlsx")
 
-# print("Se ha creado el archivo Excel: output.xlsx")
+print("Se ha creado el archivo Excel: output.xlsx")
 
-# print('Finalizado en: ', (time.time()-tcpu0), 'segundos')
+print('Finalizado en: ', (time.time()-tcpu0), 'segundos')
