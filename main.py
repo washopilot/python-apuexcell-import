@@ -21,9 +21,9 @@ for sheet in wb.sheetnames:
     _detailedSheet = listing_sheet(wb[sheet], 1, 7)
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Equipo y herramienta', 'Materiales'), (1, 2))
+        _detailedSheet, 'Equipo y herramienta', 'Materiales'), (1, 2, 4))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Materiales', 'Transporte'), (1, 2))
+        _detailedSheet, 'Materiales', 'Transporte'), (1, 2, 4))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'Transporte', 'Mano de Obra'), (1, 2, 4))
     labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
@@ -97,6 +97,7 @@ for index, value in enumerate(clean_equipment_dict.items(), start=1):
         _active_sheet[f'A{index}'] = value[0]
         _active_sheet[f'B{index}'] = value[1][0]
         _active_sheet[f'C{index}'] = value[1][1]
+        _active_sheet[f'C{index}'] = value[1][2]
         # print(index, value)
     except IndexError:
         continue
@@ -117,6 +118,7 @@ for index, value in enumerate(clean_materials_dict.items(), start=1):
         _active_sheet[f'B{index}'] = value[1][0]
         _active_sheet[f'C{index}'] = value[1][1]
         _active_sheet[f'D{index}'] = value[1][2]
+        _active_sheet[f'D{index}'] = value[1][3]
     except IndexError:
         continue
 
