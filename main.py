@@ -27,7 +27,7 @@ for sheet in wb.sheetnames:
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'Transporte', 'Mano de Obra'), (1, 2, 4))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', delete_first=True, delete_last=False), (1, 2, 4))
+        _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', delete_first=True, delete_last=False), (1, 4))
 
     # print(tabulate(equipment_list))
 
