@@ -33,13 +33,13 @@ for sheet in wb.sheetnames:
 
 # Limpieza de repetidos y ordenamiento
 clean_equipment_dict = {index: value for index,
-                        value in enumerate(sorted(set(equipment_list)), 1000)}
+                        value in enumerate(sorted(set(equipment_list)), 77)}
 clean_labour_dict = {index: value for index,
-                     value in enumerate(sorted(set(labour_list)), 2000)}
+                     value in enumerate(sorted(set(labour_list)), 532)}
 clean_materials_dict = {index: value for index,
-                        value in enumerate(sorted(set(materials_list)), 3000)}
+                        value in enumerate(sorted(set(materials_list)), 3226)}
 clean_transport_dict = {index: value for index,
-                        value in enumerate(sorted(set(transport_list)), 4000)}
+                        value in enumerate(sorted(set(transport_list)), 10000)}
 
 print(tabulate(clean_equipment_dict.items()))
 print(tabulate(clean_labour_dict.items()))
@@ -81,7 +81,7 @@ for sheet in wb.sheetnames:
 
 
 # Creación del diccionario general de Rubros
-dict_data = {index: value for index, value in enumerate(listing_data, 1000)}
+dict_data = {index: value for index, value in enumerate(listing_data, 3237)}
 print(dict_data)
 
 # Close the workbook after reading
@@ -132,33 +132,33 @@ for index, value in enumerate(clean_transport_dict.items(), start=1):
     except IndexError:
         continue
 
-# _active_sheet = excel_book.create_sheet(title='RUBROS')
-# MAX_ITERATIONS = 20
+_active_sheet = excel_book.create_sheet(title='RUBROS')
+MAX_ITERATIONS = 20
 
-# for index, (key, data) in enumerate(dict_data.items(), start=1):
-#     _active_sheet[f'A{index}'] = key
-#     _active_sheet[f'E{index}'] = data['RUBRO']
-#     _active_sheet[f'F{index}'] = data['ITEM']
-#     _active_sheet[f'G{index}'] = data['UNIDAD']
-#     _active_sheet[f'H{index}'] = 1
+for index, (key, data) in enumerate(dict_data.items(), start=1):
+    _active_sheet[f'A{index}'] = key
+    _active_sheet[f'E{index}'] = data['RUBRO']
+    _active_sheet[f'F{index}'] = data['ITEM']
+    _active_sheet[f'G{index}'] = data['UNIDAD']
+    _active_sheet[f'H{index}'] = 1
 
-#     for category, col_start in zip(['MATERIALES', 'MANO DE OBRA', 'EQUIPO', 'TRANSPORTE'], [9, 49, 89, 129]):
-#         for _i, item in enumerate(data[category], start=1):
-#             col_step = 2
-#             if _i > MAX_ITERATIONS:
-#                 break
-#             try:
-#                 col_letter_1 = utils.get_column_letter(
-#                     col_start + (_i - 1) * col_step)
-#                 col_letter_2 = utils.get_column_letter(
-#                     col_start + (_i - 1) * col_step + 1)
-#                 _active_sheet[f'{col_letter_1}{index}'] = float(item[0])
-#                 try:
-#                     _active_sheet[f'{col_letter_2}{index}'] = float(item[1])
-#                 except ValueError:
-#                     continue
-#             except IndexError:
-#                 continue
+    for category, col_start in zip(['MATERIALES', 'MANO DE OBRA', 'EQUIPO', 'TRANSPORTE'], [9, 49, 89, 129]):
+        for _i, item in enumerate(data[category], start=1):
+            col_step = 2
+            if _i > MAX_ITERATIONS:
+                break
+            try:
+                col_letter_1 = utils.get_column_letter(
+                    col_start + (_i - 1) * col_step)
+                col_letter_2 = utils.get_column_letter(
+                    col_start + (_i - 1) * col_step + 1)
+                _active_sheet[f'{col_letter_1}{index}'] = float(item[0])
+                try:
+                    _active_sheet[f'{col_letter_2}{index}'] = float(item[1])
+                except ValueError:
+                    continue
+            except IndexError:
+                continue
 
 # Guardar el libro de Excel
 excel_book.save("output.xlsx")
