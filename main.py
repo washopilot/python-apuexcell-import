@@ -33,49 +33,51 @@ for sheet in wb.sheetnames:
 
 # Limpieza de repetidos y ordenamiento
 clean_equipment_dict = {index: value for index,
-                        value in enumerate(sorted(set(equipment_list)), 77)}
+                        value in enumerate(sorted(set(equipment_list)), 1000)}
 clean_labour_dict = {index: value for index,
-                     value in enumerate(sorted(set(labour_list)), 532)}
+                     value in enumerate(sorted(set(labour_list)), 2000)}
 clean_materials_dict = {index: value for index,
-                        value in enumerate(sorted(set(materials_list)), 222)}
+                        value in enumerate(sorted(set(materials_list)), 3000)}
 clean_transport_dict = {index: value for index,
-                        value in enumerate(sorted(set(transport_list)), 458)}
+                        value in enumerate(sorted(set(transport_list)), 4000)}
 
 print(tabulate(clean_equipment_dict.items()))
-print(tabulate(clean_labour_dict.items()))
-print(tabulate(clean_materials_dict.items()))
-print(tabulate(clean_transport_dict.items()))
+# print(tabulate(clean_labour_dict.items()))
+# print(tabulate(clean_materials_dict.items()))
+# print(tabulate(clean_transport_dict.items()))
 
-# # Segunda vuelta de rubros
-# for sheet in wb.sheetnames:
-#     if sheet == 'Rubros':
-#         continue
+# Segunda vuelta de rubros
+for sheet in wb.sheetnames:
+    if sheet == 'Rubros':
+        continue
 
-#     _detailedSheet = listing_sheet(wb[sheet], 1, 6)
-#     # print(_detailedSheet)
+    _detailedSheet = listing_sheet(wb[sheet], 1, 7)
+    # print(_detailedSheet)
 
-#     _equipment_list = clean_list_tuples(get_tuples_between_tags(
-#         _detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True), (0, 1, 2))
-#     _new_equipment_list = transform_tuples(
-#         clean_equipment_dict, _equipment_list)
+    _equipment_list = clean_list_tuples(get_tuples_between_tags(
+        _detailedSheet, 'Equipo y herramienta', 'Materiales', True), (1, 2, 3))
+    _new_equipment_list = transform_tuples(
+        clean_equipment_dict, _equipment_list)
+    print(tabulate(_equipment_list))
 
-#     _labour_list = clean_list_tuples(get_tuples_between_tags(
-#         _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True), (0, 1, 2))
-#     _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
-#     _materials_list = clean_list_tuples(get_tuples_between_tags(
-#         _detailedSheet, 'MATERIALES', 'TRANSPORTE', True), (0, 2, 3, 4))
-#     _new_materials_list = transform_tuples(
-#         clean_materials_dict, _materials_list)
+    # _labour_list = clean_list_tuples(get_tuples_between_tags(
+    #     _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True), (0, 1, 2))
+    # _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
-#     _transport_list = clean_list_tuples(get_tuples_between_tags(
-#         _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 2, 3, 4))
-#     _new_transport_list = transform_tuples(
-#         clean_transport_dict, _transport_list)
+    # _materials_list = clean_list_tuples(get_tuples_between_tags(
+    #     _detailedSheet, 'MATERIALES', 'TRANSPORTE', True), (0, 2, 3, 4))
+    # _new_materials_list = transform_tuples(
+    #     clean_materials_dict, _materials_list)
 
-#     _new_pa = {'SHEET': sheet, 'ITEM': _detailedSheet[8][0], 'RUBRO': (_detailedSheet[4][0]).replace('RUBRO: ', ''), 'UNIDAD': _detailedSheet[6][0].replace(
-#         'UNIDAD: ', ''), 'EQUIPO': _new_equipment_list, 'MANO DE OBRA': _new_labour_list, 'MATERIALES': _new_materials_list, 'TRANSPORTE': _new_transport_list}
-#     listing_data.append(_new_pa)
+    # _transport_list = clean_list_tuples(get_tuples_between_tags(
+    #     _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 2, 3, 4))
+    # _new_transport_list = transform_tuples(
+    #     clean_transport_dict, _transport_list)
+
+    # _new_pa = {'SHEET': sheet, 'ITEM': _detailedSheet[8][0], 'RUBRO': (_detailedSheet[4][0]).replace('RUBRO: ', ''), 'UNIDAD': _detailedSheet[6][0].replace(
+    #     'UNIDAD: ', ''), 'EQUIPO': _new_equipment_list, 'MANO DE OBRA': _new_labour_list, 'MATERIALES': _new_materials_list, 'TRANSPORTE': _new_transport_list}
+    # listing_data.append(_new_pa)
 
 
 # # Creación del diccionario general de Rubros
