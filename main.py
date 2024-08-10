@@ -21,13 +21,13 @@ for sheet in wb.sheetnames:
     _detailedSheet = listing_sheet(wb[sheet], 1, 7)
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Equipo y herramienta', 'Materiales'), (1, 4))
+        _detailedSheet, 'Equipo y herramienta', 'Materiales', True, False), (1, 4))
     labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', True, False), (1, 4))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Materiales', 'Subtotal de Materiales:'), (1, 2, 4))
+        _detailedSheet, 'Materiales', 'Subtotal de Materiales:', True, False), (1, 2, 4))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Transporte', 'Subtotal de Transporte:'), (1, 2, 4))
+        _detailedSheet, 'Transporte', 'Subtotal de Transporte:', True, False), (1, 2, 4))
 
     # print(tabulate(equipment_list))
 
