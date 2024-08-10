@@ -56,7 +56,7 @@ for sheet in wb.sheetnames:
     # print(_detailedSheet)
 
     _equipment_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Equipo y herramienta', 'Materiales', True), (1, 3, 4))
+        _detailedSheet, 'Equipo y herramienta', 'Materiales', True, False), (1, 3, 4))
     _new_equipment_list = transform_tuples(
         clean_equipment_dict, _equipment_list)
 
@@ -65,12 +65,12 @@ for sheet in wb.sheetnames:
     _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
     _materials_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Materiales', 'Subtotal de Materiales:'), (1, 2, 3, 4))
+        _detailedSheet, 'Materiales', 'Subtotal de Materiales:', True, False), (1, 2, 3, 4))
     _new_materials_list = transform_tuples(
         clean_materials_dict, _materials_list)
 
     _transport_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Transporte', 'Subtotal de Transporte:'), (1, 2, 3, 4))
+        _detailedSheet, 'Transporte', 'Subtotal de Transporte:', True, False), (1, 2, 3, 4))
     _new_transport_list = transform_tuples(
         clean_transport_dict, _transport_list)
 
