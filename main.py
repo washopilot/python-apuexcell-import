@@ -18,18 +18,19 @@ for sheet in wb.sheetnames:
     if sheet == 'Rubros':
         continue
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 6)
+    _detailedSheet = listing_sheet(wb[sheet], 1, 7)
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA'), (0, 2))
+        _detailedSheet, 'Equipo y herramienta', 'Materiales'), (1, 4))
     labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MANO DE OBRA', 'MATERIALES'), (0, 2))
+        _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', True, False), (1, 4))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MATERIALES', 'TRANSPORTE'), (0, 2, 4))
+        _detailedSheet, 'Materiales', 'Subtotal de Materiales:'), (1, 2, 4))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', delete_first=True, delete_last=False), (0, 2, 4))
+        _detailedSheet, 'Transporte', 'Subtotal de Transporte:'), (1, 2, 4))
 
     # print(tabulate(equipment_list))
+
 
 # Limpieza de repetidos y ordenamiento
 clean_equipment_dict = {index: value for index,
@@ -37,9 +38,9 @@ clean_equipment_dict = {index: value for index,
 clean_labour_dict = {index: value for index,
                      value in enumerate(sorted(set(labour_list)), 532)}
 clean_materials_dict = {index: value for index,
-                        value in enumerate(sorted(set(materials_list)), 222)}
+                        value in enumerate(sorted(set(materials_list)), 3226)}
 clean_transport_dict = {index: value for index,
-                        value in enumerate(sorted(set(transport_list)), 458)}
+                        value in enumerate(sorted(set(transport_list)), 4000)}
 
 print(tabulate(clean_equipment_dict.items()))
 print(tabulate(clean_labour_dict.items()))
@@ -51,35 +52,44 @@ for sheet in wb.sheetnames:
     if sheet == 'Rubros':
         continue
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 6)
+    _detailedSheet = listing_sheet(wb[sheet], 1, 7)
     # print(_detailedSheet)
 
     _equipment_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True), (0, 1, 2))
+        _detailedSheet, 'Equipo y herramienta', 'Materiales', True), (1, 3, 4))
     _new_equipment_list = transform_tuples(
         clean_equipment_dict, _equipment_list)
 
     _labour_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True), (0, 1, 2))
+        _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', True, False), (1, 3, 4))
     _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
     _materials_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True), (0, 2, 3, 4))
+        _detailedSheet, 'Materiales', 'Subtotal de Materiales:'), (1, 2, 3, 4))
     _new_materials_list = transform_tuples(
         clean_materials_dict, _materials_list)
 
     _transport_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 2, 3, 4))
+        _detailedSheet, 'Transporte', 'Subtotal de Transporte:'), (1, 2, 3, 4))
     _new_transport_list = transform_tuples(
         clean_transport_dict, _transport_list)
 
-    _new_pa = {'SHEET': sheet, 'ITEM': _detailedSheet[8][0], 'RUBRO': (_detailedSheet[4][0]).replace('RUBRO: ', ''), 'UNIDAD': _detailedSheet[6][0].replace(
-        'UNIDAD: ', ''), 'EQUIPO': _new_equipment_list, 'MANO DE OBRA': _new_labour_list, 'MATERIALES': _new_materials_list, 'TRANSPORTE': _new_transport_list}
+    _new_pa = {
+        'SHEET': sheet,
+        'ITEM': _detailedSheet[6][0].replace('Código:', '').strip(),
+        'RUBRO': (_detailedSheet[8][0]).replace('Descrip.:', '').strip(),
+        'UNIDAD': _detailedSheet[10][0].replace('Unidad:', '').strip(),
+        'EQUIPO': _new_equipment_list,
+        'MANO DE OBRA': _new_labour_list,
+        'MATERIALES': _new_materials_list,
+        'TRANSPORTE': _new_transport_list
+    }
+    # print(_new_pa)
     listing_data.append(_new_pa)
 
 
 # Creación del diccionario general de Rubros
-dict_data = {index: value for index, value in enumerate(listing_data, 164)}
+dict_data = {index: value for index, value in enumerate(listing_data, 3237)}
 print(dict_data)
 
 # Close the workbook after reading
@@ -94,17 +104,17 @@ for index, value in enumerate(clean_equipment_dict.items(), start=1):
     try:
         _active_sheet[f'A{index}'] = value[0]
         _active_sheet[f'B{index}'] = value[1][0]
-        _active_sheet[f'D{index}'] = float(value[1][1])
-        # print(index, value)
+        _active_sheet[f'C{index}'] = value[1][1]
+        print(index, value)
     except IndexError:
         continue
 
 _active_sheet = excel_book.create_sheet(title='MANO DE OBRA')
 for index, value in enumerate(clean_labour_dict.items(), start=1):
     try:
-        _active_sheet[f'H{index}'] = value[0]
-        _active_sheet[f'I{index}'] = value[1][0]
-        _active_sheet[f'AC{index}'] = float(value[1][1])
+        _active_sheet[f'A{index}'] = value[0]
+        _active_sheet[f'B{index}'] = value[1][0]
+        _active_sheet[f'C{index}'] = float(value[1][1])
     except IndexError:
         continue
 
@@ -114,7 +124,7 @@ for index, value in enumerate(clean_materials_dict.items(), start=1):
         _active_sheet[f'A{index}'] = value[0]
         _active_sheet[f'B{index}'] = value[1][0]
         _active_sheet[f'C{index}'] = value[1][1]
-        _active_sheet[f'D{index}'] = float(value[1][2])
+        _active_sheet[f'D{index}'] = value[1][2]
     except IndexError:
         continue
 
@@ -124,7 +134,7 @@ for index, value in enumerate(clean_transport_dict.items(), start=1):
         _active_sheet[f'A{index}'] = value[0]
         _active_sheet[f'B{index}'] = value[1][0]
         _active_sheet[f'C{index}'] = value[1][1]
-        _active_sheet[f'G{index}'] = float(value[1][2])
+        _active_sheet[f'D{index}'] = float(value[1][2])
     except IndexError:
         continue
 
