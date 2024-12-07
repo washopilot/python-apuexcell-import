@@ -18,10 +18,10 @@ for sheet in wb.sheetnames:
     if sheet == 'Rubros':
         continue
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 7)
+    _detailedSheet = listing_sheet(wb[sheet], 1, 8)
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Equipo y herramienta', 'Materiales', True, False), (1, 4))
+        _detailedSheet, 'Equipo y herramienta', 'Subtotal de Equipo:', True, False), (1, 4))
     labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', True, False), (1, 4))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
@@ -29,34 +29,33 @@ for sheet in wb.sheetnames:
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'Transporte', 'Subtotal de Transporte:', True, False), (1, 2, 4))
 
-    # print(tabulate(equipment_list))
-
+    # print(tabulate(transport_list))
 
 # Limpieza de repetidos y ordenamiento
 clean_equipment_dict = {index: value for index,
-                        value in enumerate(sorted(set(equipment_list)), 77)}
+                        value in enumerate(sorted(set(equipment_list)), 117)}
 clean_labour_dict = {index: value for index,
-                     value in enumerate(sorted(set(labour_list)), 532)}
+                     value in enumerate(sorted(set(labour_list)), 560)}
 clean_materials_dict = {index: value for index,
-                        value in enumerate(sorted(set(materials_list)), 3226)}
+                        value in enumerate(sorted(set(materials_list)), 3758)}
 clean_transport_dict = {index: value for index,
                         value in enumerate(sorted(set(transport_list)), 4000)}
 
-print(tabulate(clean_equipment_dict.items()))
-print(tabulate(clean_labour_dict.items()))
-print(tabulate(clean_materials_dict.items()))
-print(tabulate(clean_transport_dict.items()))
+# print(tabulate(clean_equipment_dict.items()))
+# print(tabulate(clean_labour_dict.items()))
+# print(tabulate(clean_materials_dict.items()))
+# print(tabulate(clean_transport_dict.items()))
 
 # Segunda vuelta de rubros
 for sheet in wb.sheetnames:
     if sheet == 'Rubros':
         continue
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 7)
+    _detailedSheet = listing_sheet(wb[sheet], 1, 8)
     # print(_detailedSheet)
 
     _equipment_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Equipo y herramienta', 'Materiales', True, False), (1, 3, 4))
+        _detailedSheet, 'Equipo y herramienta', 'Subtotal de Equipo:', True, False), (1, 3, 4))
     _new_equipment_list = transform_tuples(
         clean_equipment_dict, _equipment_list)
 
@@ -76,9 +75,9 @@ for sheet in wb.sheetnames:
 
     _new_pa = {
         'SHEET': sheet,
-        'ITEM': _detailedSheet[6][0].replace('Código:', '').strip(),
-        'RUBRO': (_detailedSheet[8][0]).replace('Descrip.:', '').strip(),
-        'UNIDAD': _detailedSheet[10][0].replace('Unidad:', '').strip(),
+        'ITEM': _detailedSheet[2][1].__str__().strip(),
+        'RUBRO': (_detailedSheet[3][1]).__str__().strip(),
+        'UNIDAD': _detailedSheet[4][1].__str__().strip(),
         'EQUIPO': _new_equipment_list,
         'MANO DE OBRA': _new_labour_list,
         'MATERIALES': _new_materials_list,
@@ -89,7 +88,7 @@ for sheet in wb.sheetnames:
 
 
 # Creación del diccionario general de Rubros
-dict_data = {index: value for index, value in enumerate(listing_data, 3237)}
+dict_data = {index: value for index, value in enumerate(listing_data, 3513)}
 print(dict_data)
 
 # Close the workbook after reading
@@ -105,7 +104,7 @@ for index, value in enumerate(clean_equipment_dict.items(), start=1):
         _active_sheet[f'A{index}'] = value[0]
         _active_sheet[f'B{index}'] = value[1][0]
         _active_sheet[f'C{index}'] = value[1][1]
-        print(index, value)
+        # print(index, value)
     except IndexError:
         continue
 
