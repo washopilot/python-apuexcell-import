@@ -3,7 +3,7 @@
 {
     "name": "Python-Apuexcel",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-    "image": "docker.io/library/debian:stable-slim",
+    "image": "docker.io/library/python:3.12-slim-bookworm",
 
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
@@ -12,13 +12,12 @@
             "installOhMyZsh": true,
             "installOhMyZshConfig": true,
             "upgradePackages": true,
-            "username": "devuser",
+            "username": "devcontainer",
             "userUid": "automatic",
             "userGid": "automatic"
         },
-        "ghcr.io/devcontainers/features/python:1": {
-            "installTools": true,
-            "version": "3.12"
+        "ghcr.io/devcontainers-extra/features/pipenv:2": {
+            "version": "latest"
         }
     },
 
@@ -31,14 +30,14 @@
             "extensions": [
                 "donjayamanne.python-extension-pack",
                 "esbenp.prettier-vscode",
-                "donjayamanne.githistory",
                 "ms-python.isort",
-                "ms-python.autopep8"
+                "ms-python.autopep8",
+                "mhutchie.git-graph"
             ]
         }
     },
 
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-    "remoteUser": "devuser",
+    "remoteUser": "devcontainer",
     "postStartCommand": "pipenv install"
 }
