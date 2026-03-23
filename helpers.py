@@ -54,7 +54,7 @@ def get_tuples_between_tags(lst: list, start_tag: str, end_tag: str, delete_firs
         if delete_first:
             result.pop(0)
         if delete_last:
-            result.pop(-1)
+            result.pop(-2)
 
     return result
 
@@ -73,7 +73,7 @@ def clean_list_tuples(lst: list, cols: tuple):
     result = []
 
     for _tpl in lst:
-        _conditions_to_exclude = ['Herramienta Menor (5% de Mano de Obra)', 'herramientas menores', 'Herramienta menor', 'Herramientas eléctricas', 'Herramienta liviana', 'Equipo liviano', 'Herramienta manual y menor de construcción', 'Herramienta Menor 5%MO', 'Herramienta manual y menor de construcción', 'Herramienta manual y menor de metalmecanica', 'Herramienta manual y menor de plomería' ]
+        _conditions_to_exclude = ['Herramienta Menor (5% de Mano de Obra)', 'herramientas menores', 'Herramienta menor', 'Herramientas eléctricas', 'Herramienta liviana', 'Equipo liviano', 'Herramienta manual y menor de construcción', 'Herramienta Menor 5%MO', 'Herramienta manual y menor de construcción', 'Herramienta manual y menor de metalmecanica', 'Herramienta manual y menor de plomería', 'Herramienta Menor (5% M.O.)', 'Herramienta Menor (5% M.O.)' ]
         if any(condition in _tpl for condition in _conditions_to_exclude):
             _resulting_tuple = (_tpl[cols[0]],)
         else:
