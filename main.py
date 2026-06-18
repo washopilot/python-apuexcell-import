@@ -3,7 +3,11 @@ import time
 from openpyxl import Workbook, load_workbook, utils
 from tabulate import tabulate
 
-from helpers import clean_list_tuples, get_tuples_between_tags, listing_sheet, transform_tuples
+from helpers import (
+    clean_list_tuples, get_tuples_between_tags,
+    listing_sheet, transform_tuples,
+    EXCLUDED_EQUIPMENT_CONDITIONS, EXCLUDED_EQUIPMENT_INDEX
+)
 
 tcpu0 = time.time()
 
@@ -20,7 +24,7 @@ for sheet in wb.sheetnames:
         continue
 
     _detailedSheet = listing_sheet(wb[sheet], 1, 10)
-    
+
     print(sheet)
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
@@ -35,8 +39,26 @@ for sheet in wb.sheetnames:
     # print(tabulate(equipment_list))
 
 # Limpieza de repetidos y ordenamiento
-clean_equipment_dict = {index: value for index,
-                        value in enumerate(sorted(set(equipment_list)), 81)}
+
+# ----- Normaliza y coloca el indice para la herramienta menor a 1 si la encuentra ----
+_normal_equipment = sorted(set(
+    item for item in equipment_list
+    if not any(cond in item for cond in EXCLUDED_EQUIPMENT_CONDITIONS)
+))
+
+_excluded_equipment = sorted(set(
+    item for item in equipment_list
+    if any(cond in item for cond in EXCLUDED_EQUIPMENT_CONDITIONS)
+))
+
+clean_equipment_dict = {
+    EXCLUDED_EQUIPMENT_INDEX: item for item in _excluded_equipment}
+clean_equipment_dict.update({
+    index: value
+    for index, value in enumerate(_normal_equipment, 81)
+})
+# -----
+
 clean_labour_dict = {index: value for index,
                      value in enumerate(sorted(set(labour_list)), 532)}
 clean_materials_dict = {index: value for index,
@@ -66,7 +88,7 @@ for sheet in wb.sheetnames:
         _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True, True), (0, 2, 4))
     _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
-    _materials_list = clean_list_tuples(get_tuples_between_tags(    
+    _materials_list = clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 1, 2, 4))
     _new_materials_list = transform_tuples(
         clean_materials_dict, _materials_list)
