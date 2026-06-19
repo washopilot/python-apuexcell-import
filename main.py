@@ -20,23 +20,23 @@ equipment_list = labour_list = materials_list = transport_list = []
 
 # Bucle busqueda y limpieza de insumos
 for sheet in wb.sheetnames:
-    if sheet == 'Rubros':
+    if sheet == 'Presupuesto':
         continue
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 10)
+    _detailedSheet = listing_sheet(wb[sheet], 1, 6)
 
-    print(sheet)
+    # print(sheet)
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True, True), (0, 3))
+        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True, True), (0, 2))
     labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True, True), (0, 4))
+        _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True, True), (0, 2))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 1, 4))
+        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 2, 4))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'TRANSPORTE', '', True, True), (0, 1, 3))
+        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 1, 4))
 
-    # print(tabulate(equipment_list))
+    # print(tabulate(transport_list))
 
 # Limpieza de repetidos y ordenamiento
 
@@ -53,6 +53,7 @@ _excluded_equipment = sorted(set(
 
 clean_equipment_dict = {
     EXCLUDED_EQUIPMENT_INDEX: item for item in _excluded_equipment}
+
 clean_equipment_dict.update({
     index: value
     for index, value in enumerate(_normal_equipment, 81)
@@ -73,36 +74,36 @@ print(tabulate(clean_transport_dict.items()))
 
 # Segunda vuelta de rubros
 for sheet in wb.sheetnames:
-    # if sheet == 'Rubros':
-    #     continue
+    if sheet == 'Presupuesto':
+        continue
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 10)
+    _detailedSheet = listing_sheet(wb[sheet], 1, 6)
     # print(_detailedSheet)
 
     _equipment_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True, True), (0, 1, 3))
+        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True, True), (0, 1, 2))
     _new_equipment_list = transform_tuples(
         clean_equipment_dict, _equipment_list)
 
     _labour_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True, True), (0, 2, 4))
+        _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True, True), (0, 1, 2))
     _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
     _materials_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 1, 2, 4))
+        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 2, 3, 4))
     _new_materials_list = transform_tuples(
         clean_materials_dict, _materials_list)
 
     _transport_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'TRANSPORTE', '', True, True), (0, 1, 2, 3))
+        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 2, 3, 4))
     _new_transport_list = transform_tuples(
         clean_transport_dict, _transport_list)
 
     _new_pa = {
         'SHEET': sheet,
-        'ITEM': _detailedSheet[1][1].__str__().strip(),
-        'RUBRO': _detailedSheet[2][1].__str__().strip(),
-        'UNIDAD': _detailedSheet[2][3].__str__().strip(),
+        'ITEM': _detailedSheet[6][0].__str__().strip(),
+        'RUBRO': _detailedSheet[4][1].__str__().strip(),
+        'UNIDAD': _detailedSheet[4][5].__str__().strip(),
         'EQUIPO': _new_equipment_list,
         'MANO DE OBRA': _new_labour_list,
         'MATERIALES': _new_materials_list,
@@ -110,11 +111,20 @@ for sheet in wb.sheetnames:
     }
     # print(_new_pa)
     listing_data.append(_new_pa)
+    
+# Eliminar duplicados de la lista general en función del nombre del RUBRO
+original_count = len(listing_data)
+listing_data = list({item['RUBRO']: item for item in listing_data}.values())
+duplicates = original_count - len(listing_data)
 
+if duplicates:
+    print(f"Se eliminaron {duplicates} repetidos")
+else:
+    print("No hubo repetidos")
 
 # Creación del diccionario general de Rubros
 dict_data = {index: value for index, value in enumerate(listing_data, 3263)}
-print(dict_data)
+# print(dict_data)
 
 # Close the workbook after reading
 wb.close()
@@ -190,7 +200,7 @@ for index, (key, data) in enumerate(dict_data.items(), start=1):
             except IndexError:
                 continue
 
-# Guardar el libro de Excel
+# # Guardar el libro de Excel
 excel_book.save("output.xlsx")
 
 print("Se ha creado el archivo Excel: output.xlsx")

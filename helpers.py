@@ -5,7 +5,7 @@ EXCLUDED_EQUIPMENT_CONDITIONS = [
     'Herramientas eléctricas', 'Herramienta liviana', 'Equipo liviano',
     'Herramienta manual y menor de construcción', 'Herramienta Menor 5%MO',
     'Herramienta manual y menor de metalmecanica', 'Herramienta manual y menor de plomería',
-    'Herramienta Menor (5% M.O.)', 'HERRAMIENTA MENOR 5% M.O.'
+    'Herramienta Menor (5% M.O.)', 'HERRAMIENTA MENOR 5% M.O.', 'Herramienta menor (5% M.O.)'
 ]
 
 EXCLUDED_EQUIPMENT_INDEX = 1
@@ -62,9 +62,9 @@ def get_tuples_between_tags(lst: list, start_tag: str, end_tag: str, delete_firs
     if len(result) >= 2:
         if delete_first:
             result.pop(0)
+            result.pop(0)
         if delete_last:
-            result.pop(-2)
-
+            result.pop(-1)
     return result
 
 
