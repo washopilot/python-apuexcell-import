@@ -2,12 +2,18 @@ import time
 
 from openpyxl import Workbook, load_workbook, utils
 from tabulate import tabulate
+from tqdm import tqdm
 
 from helpers import (
     clean_list_tuples, get_tuples_between_tags,
     listing_sheet, transform_tuples,
     EXCLUDED_EQUIPMENT_CONDITIONS, EXCLUDED_EQUIPMENT_INDEX
 )
+
+GREEN_BOLD = '\033[1;32m'
+CYAN_BOLD  = '\033[1;36m'
+RESET      = '\033[0m'
+YELLOW_BOLD = '\033[1;33m'
 
 tcpu0 = time.time()
 
@@ -19,7 +25,7 @@ listing_data = []  # Aquí se almacena todos los apus
 equipment_list = labour_list = materials_list = transport_list = []
 
 # Bucle busqueda y limpieza de insumos
-for sheet in wb.sheetnames:
+for sheet in tqdm(wb.sheetnames, desc="Procesando hojas", unit="hoja"):
     if sheet == 'Presupuesto':
         continue
 
@@ -51,6 +57,9 @@ _excluded_equipment = sorted(set(
     if any(cond in item for cond in EXCLUDED_EQUIPMENT_CONDITIONS)
 ))
 
+if len(_excluded_equipment) > 1:
+    print(f"{YELLOW_BOLD}⚠ WARNING: múltiples herramientas menores: {_excluded_equipment}{RESET}")
+
 clean_equipment_dict = {
     EXCLUDED_EQUIPMENT_INDEX: item for item in _excluded_equipment}
 
@@ -73,7 +82,7 @@ print(tabulate(clean_materials_dict.items()))
 print(tabulate(clean_transport_dict.items()))
 
 # Segunda vuelta de rubros
-for sheet in wb.sheetnames:
+for sheet in tqdm(wb.sheetnames, desc="Segunda vuelta", unit="hoja"):
     if sheet == 'Presupuesto':
         continue
 
@@ -118,7 +127,7 @@ listing_data = list({item['RUBRO']: item for item in listing_data}.values())
 duplicates = original_count - len(listing_data)
 
 if duplicates:
-    print(f"Se eliminaron {duplicates} repetidos")
+    print(f"Se eliminaron {duplicates} rubros repetidos")
 else:
     print("No hubo repetidos")
 
@@ -203,6 +212,5 @@ for index, (key, data) in enumerate(dict_data.items(), start=1):
 # # Guardar el libro de Excel
 excel_book.save("output.xlsx")
 
-print("Se ha creado el archivo Excel: output.xlsx")
-
-print('Finalizado en: ', (time.time()-tcpu0), 'segundos')
+print(f"\n{GREEN_BOLD}✔ Se ha creado el archivo Excel: output.xlsx{RESET}")
+print(f"{CYAN_BOLD}⏱ Finalizado en: {(time.time()-tcpu0):.2f} segundos{RESET}\n")
