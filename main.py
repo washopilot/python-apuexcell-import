@@ -11,38 +11,48 @@ from helpers import (
 )
 
 GREEN_BOLD = '\033[1;32m'
-CYAN_BOLD  = '\033[1;36m'
-RESET      = '\033[0m'
+CYAN_BOLD = '\033[1;36m'
+RESET = '\033[0m'
 YELLOW_BOLD = '\033[1;33m'
 
 tcpu0 = time.time()
 
-# wb = load_workbook(filename='original.xlsx', read_only=True, data_only=True)
 wb = load_workbook(filename='original.xlsx', read_only=True, data_only=True)
 
 # Inicialización de data
-listing_data = []  # Aquí se almacena todos los apus
+listing_data = []
 equipment_list = labour_list = materials_list = transport_list = []
 
-# Bucle busqueda y limpieza de insumos
-for sheet in tqdm(wb.sheetnames, desc="Procesando hojas", unit="hoja"):
-    if sheet == 'Presupuesto':
-        continue
+# Configuración para la hoja ANALISIS
+N_ITERATIONS = 80  # Cambiar este valor para n veces
+START_ROW = 7
+END_ROW = 116  # Incluyente: filas 7-116 = 110 filas
+ROWS_PER_CHUNK = END_ROW - START_ROW + 1
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 6)
+sheet_name = 'ANALISIS'
+ws = wb[sheet_name]
 
-    # print(sheet)
+# Primera vuelta de rubros
+for iteration in tqdm(range(1, N_ITERATIONS+1), desc="Procesando iteraciones", unit="iter"):
+    chunk_start = START_ROW + (iteration-1) * ROWS_PER_CHUNK
+    chunk_end = END_ROW + (iteration-1) * ROWS_PER_CHUNK
+    # print('chunk_start :', chunk_start)
+    # print('chunk_end :', chunk_end)
+    # print('iteration :', iteration)
+
+    _detailedSheet = listing_sheet(ws, 4, 10, chunk_start, chunk_end)
+    # print(tabulate(_detailedSheet))
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True, True), (0, 2))
+        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA ', True, True), (0, 3))
     labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True, True), (0, 2))
+        _detailedSheet, 'MANO DE OBRA ', 'MATERIALES', True, True), (0, 3))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 2, 4))
+        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 3, 5))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 1, 4))
+        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL (P)', True, False), (0, 3, 5))
 
-    # print(tabulate(transport_list))
+    # print(tabulate(equipment_list))
 
 # Limpieza de repetidos y ordenamiento
 
@@ -82,37 +92,37 @@ print(tabulate(clean_materials_dict.items()))
 print(tabulate(clean_transport_dict.items()))
 
 # Segunda vuelta de rubros
-for sheet in tqdm(wb.sheetnames, desc="Segunda vuelta", unit="hoja"):
-    if sheet == 'Presupuesto':
-        continue
+for iteration in tqdm(range(1, N_ITERATIONS+1), desc="Segunda vuelta", unit="iter"):
+    chunk_start = START_ROW + (iteration-1) * ROWS_PER_CHUNK
+    chunk_end = END_ROW + (iteration-1) * ROWS_PER_CHUNK
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 6)
+    _detailedSheet = listing_sheet(ws, 4, 10, chunk_start, chunk_end)
     # print(_detailedSheet)
 
     _equipment_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA', True, True), (0, 1, 2))
+        _detailedSheet, 'EQUIPOS', 'MANO DE OBRA ', True, True), (0, 2, 3))
     _new_equipment_list = transform_tuples(
         clean_equipment_dict, _equipment_list)
 
     _labour_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True, True), (0, 1, 2))
+        _detailedSheet, 'MANO DE OBRA ', 'MATERIALES', True, True), (0, 2, 3))
     _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
     _materials_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 2, 3, 4))
+        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 3, 4, 5))
     _new_materials_list = transform_tuples(
         clean_materials_dict, _materials_list)
 
     _transport_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 2, 3, 4))
+        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL (P)', True, False), (0, 3, 4, 5))
     _new_transport_list = transform_tuples(
         clean_transport_dict, _transport_list)
 
     _new_pa = {
-        'SHEET': sheet,
-        'ITEM': _detailedSheet[6][0].__str__().strip(),
-        'RUBRO': _detailedSheet[4][1].__str__().strip(),
-        'UNIDAD': _detailedSheet[4][5].__str__().strip(),
+        'SHEET': iteration,
+        'ITEM': _detailedSheet[1][6].__str__().strip(),
+        'RUBRO': _detailedSheet[6][0].__str__().strip(),
+        'UNIDAD': _detailedSheet[7][6].__str__().strip(),
         'EQUIPO': _new_equipment_list,
         'MANO DE OBRA': _new_labour_list,
         'MATERIALES': _new_materials_list,
@@ -120,7 +130,7 @@ for sheet in tqdm(wb.sheetnames, desc="Segunda vuelta", unit="hoja"):
     }
     # print(_new_pa)
     listing_data.append(_new_pa)
-    
+
 # Eliminar duplicados de la lista general en función del nombre del RUBRO
 original_count = len(listing_data)
 listing_data = list({item['RUBRO']: item for item in listing_data}.values())
@@ -133,7 +143,7 @@ else:
 
 # Creación del diccionario general de Rubros
 dict_data = {index: value for index, value in enumerate(listing_data, 3263)}
-# print(dict_data)
+print(dict_data)
 
 # Close the workbook after reading
 wb.close()

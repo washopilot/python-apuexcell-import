@@ -5,23 +5,27 @@ EXCLUDED_EQUIPMENT_CONDITIONS = [
     'Herramientas eléctricas', 'Herramienta liviana', 'Equipo liviano',
     'Herramienta manual y menor de construcción', 'Herramienta Menor 5%MO',
     'Herramienta manual y menor de metalmecanica', 'Herramienta manual y menor de plomería',
-    'Herramienta Menor (5% M.O.)', 'HERRAMIENTA MENOR 5% M.O.', 'Herramienta menor (5% M.O.)'
+    'Herramienta Menor (5% M.O.)', 'HERRAMIENTA MENOR 5% M.O.', 'Herramienta menor (5% M.O.)', 'Herramienta menor  (5% M.O.)'
 ]
 
 EXCLUDED_EQUIPMENT_INDEX = 1
 
-def listing_sheet(ws: Worksheet, min_col=2, max_col=10):
+def listing_sheet(ws: Worksheet, min_col=2, max_col=10, min_row=None, max_row=None):
     """Rutina para listar filas de una hoja del libro de excel
 
     Args:
         ws (Worksheet): libro de excell
+        min_col (int): Columna mínima
+        max_col (int): Columna máxima
+        min_row (int): Fila mínima (opcional)
+        max_row (int): Fila máxima (opcional)
 
     Returns:
         list: Lista sin depurar de las filas de una hoja 
     """
     _wsData = []
 
-    for row in ws.iter_rows(min_col=min_col, max_col=max_col):
+    for row in ws.iter_rows(min_col=min_col, max_col=max_col, min_row=min_row, max_row=max_row):
         _row = tuple(
             cell.value for cell in row)
 
@@ -61,7 +65,6 @@ def get_tuples_between_tags(lst: list, start_tag: str, end_tag: str, delete_firs
     # Eliminar el primer y último elemento de la lista resultante
     if len(result) >= 2:
         if delete_first:
-            result.pop(0)
             result.pop(0)
         if delete_last:
             result.pop(-1)
