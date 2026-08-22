@@ -38,9 +38,9 @@ for sheet in tqdm(wb.sheetnames, desc="Procesando hojas", unit="hoja"):
     labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'MANO DE OBRA', 'MATERIALES', True, True), (0, 2))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 2, 4))
+        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 1, 3))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 1, 4))
+        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL (P)', True, False), (0, 1, 3))
 
     # print(tabulate(transport_list))
 
@@ -99,20 +99,20 @@ for sheet in tqdm(wb.sheetnames, desc="Segunda vuelta", unit="hoja"):
     _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
     _materials_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 2, 3, 4))
+        _detailedSheet, 'MATERIALES', 'TRANSPORTE', True, True), (0, 1, 2, 3))
     _new_materials_list = transform_tuples(
         clean_materials_dict, _materials_list)
 
     _transport_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL P', True, False), (0, 2, 3, 4))
+        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL (P)', True, False), (0, 1, 2, 3))
     _new_transport_list = transform_tuples(
         clean_transport_dict, _transport_list)
 
     _new_pa = {
         'SHEET': sheet,
-        'ITEM': _detailedSheet[6][0].__str__().strip(),
-        'RUBRO': _detailedSheet[4][1].__str__().strip(),
-        'UNIDAD': _detailedSheet[4][5].__str__().strip(),
+        'ITEM': _detailedSheet[0][2].__str__().replace('Código: ', '').strip(),
+        'RUBRO': _detailedSheet[4][0].__str__().strip(),
+        'UNIDAD': _detailedSheet[5][2].__str__().strip(),
         'EQUIPO': _new_equipment_list,
         'MANO DE OBRA': _new_labour_list,
         'MATERIALES': _new_materials_list,
@@ -121,9 +121,9 @@ for sheet in tqdm(wb.sheetnames, desc="Segunda vuelta", unit="hoja"):
     # print(_new_pa)
     listing_data.append(_new_pa)
     
-# Eliminar duplicados de la lista general en función del nombre del RUBRO
+# Eliminar duplicados de la lista general en función del nombre del ITEM
 original_count = len(listing_data)
-listing_data = list({item['RUBRO']: item for item in listing_data}.values())
+listing_data = list({item['ITEM']: item for item in listing_data}.values())
 duplicates = original_count - len(listing_data)
 
 if duplicates:
