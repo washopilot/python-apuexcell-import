@@ -5,7 +5,7 @@ EXCLUDED_EQUIPMENT_CONDITIONS = [
     'Herramientas eléctricas', 'Herramienta liviana', 'Equipo liviano',
     'Herramienta manual y menor de construcción', 'Herramienta Menor 5%MO',
     'Herramienta manual y menor de metalmecanica', 'Herramienta manual y menor de plomería',
-    'Herramienta Menor (5% M.O.)', 'HERRAMIENTA MENOR 5% M.O.', 'Herramienta menor (5% M.O.)', 'Herramienta menor  (5% M.O.)'
+    'Herramienta Menor (5% M.O.)', 'HERRAMIENTA MENOR 5% M.O.', 'Herramienta menor (5% M.O.)', 'Herramienta menor  (5% M.O.)', 'Herramientas manuales (5% M.O.)'
 ]
 
 EXCLUDED_EQUIPMENT_INDEX = 1

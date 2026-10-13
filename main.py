@@ -24,9 +24,9 @@ listing_data = []
 equipment_list = labour_list = materials_list = transport_list = []
 
 # Configuración para la hoja ANALISIS
-N_ITERATIONS = 80  # Cambiar este valor para n veces
-START_ROW = 7
-END_ROW = 116  # Incluyente: filas 7-116 = 110 filas
+N_ITERATIONS = 343  # Cambiar este valor para n veces
+START_ROW = 8
+END_ROW = 117  # Incluyente: filas 7-116 = 110 filas
 ROWS_PER_CHUNK = END_ROW - START_ROW + 1
 
 sheet_name = 'ANALISIS'
@@ -36,9 +36,9 @@ ws = wb[sheet_name]
 for iteration in tqdm(range(1, N_ITERATIONS+1), desc="Procesando iteraciones", unit="iter"):
     chunk_start = START_ROW + (iteration-1) * ROWS_PER_CHUNK
     chunk_end = END_ROW + (iteration-1) * ROWS_PER_CHUNK
-    # print('chunk_start :', chunk_start)
-    # print('chunk_end :', chunk_end)
-    # print('iteration :', iteration)
+    print('chunk_start :', chunk_start)
+    print('chunk_end :', chunk_end)
+    print('iteration :', iteration)
 
     _detailedSheet = listing_sheet(ws, 4, 10, chunk_start, chunk_end)
     # print(tabulate(_detailedSheet))
@@ -52,7 +52,7 @@ for iteration in tqdm(range(1, N_ITERATIONS+1), desc="Procesando iteraciones", u
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
         _detailedSheet, 'TRANSPORTE', 'SUBTOTAL (P)', True, False), (0, 3, 5))
 
-    # print(tabulate(equipment_list))
+# print(tabulate(equipment_list))
 
 # Limpieza de repetidos y ordenamiento
 
@@ -120,9 +120,9 @@ for iteration in tqdm(range(1, N_ITERATIONS+1), desc="Segunda vuelta", unit="ite
 
     _new_pa = {
         'SHEET': iteration,
-        'ITEM': _detailedSheet[1][6].__str__().strip(),
-        'RUBRO': _detailedSheet[6][0].__str__().strip(),
-        'UNIDAD': _detailedSheet[7][6].__str__().strip(),
+        'ITEM': _detailedSheet[0][6].__str__().strip(),
+        'RUBRO': _detailedSheet[5][0].__str__().strip(),
+        'UNIDAD': _detailedSheet[6][6].__str__().strip(),
         'EQUIPO': _new_equipment_list,
         'MANO DE OBRA': _new_labour_list,
         'MATERIALES': _new_materials_list,
@@ -143,7 +143,7 @@ else:
 
 # Creación del diccionario general de Rubros
 dict_data = {index: value for index, value in enumerate(listing_data, 3263)}
-print(dict_data)
+print(tabulate(dict_data.items()))
 
 # Close the workbook after reading
 wb.close()
@@ -214,12 +214,16 @@ for index, (key, data) in enumerate(dict_data.items(), start=1):
                 _active_sheet[f'{col_letter_1}{index}'] = float(item[0])
                 try:
                     _active_sheet[f'{col_letter_2}{index}'] = float(item[1])
+                    print(data['RUBRO'])
+                    print(category)
+                    print(item[0])
+                    print(item[1])
                 except ValueError:
                     continue
             except IndexError:
                 continue
 
-# # Guardar el libro de Excel
+# Guardar el libro de Excel
 excel_book.save("output.xlsx")
 
 print(f"\n{GREEN_BOLD}✔ Se ha creado el archivo Excel: output.xlsx{RESET}")
