@@ -2,7 +2,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 EXCLUDED_EQUIPMENT_CONDITIONS = [
     'Herramienta Menor (5% de Mano de Obra)', 'herramientas menores', 'Herramienta menor',
-    'Herramientas eléctricas', 'Herramienta liviana', 'Equipo liviano',
+    'Herramienta liviana', 'Equipo liviano',
     'Herramienta manual y menor de construcción', 'Herramienta Menor 5%MO',
     'Herramienta manual y menor de metalmecanica', 'Herramienta manual y menor de plomería',
     'Herramienta Menor (5% M.O.)', 'HERRAMIENTA MENOR 5% M.O.', 'Herramienta menor (5% M.O.)',

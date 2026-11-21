@@ -29,18 +29,18 @@ for sheet in tqdm(wb.sheetnames, desc="Procesando hojas", unit="hoja"):
     if sheet == 'Presupuesto':
         continue
 
-    _detailedSheet = listing_sheet(wb[sheet], 1, 8)
+    _detailedSheet = listing_sheet(wb[sheet], 1, 6)
 
     # print(sheet)
 
     equipment_list = equipment_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Equipo y herramienta', 'Subtotal de Equipo:', True, False), (1, 4))
+        _detailedSheet, 'EQUIPOS', 'SUBTOTAL (M)', True, False), (0, 2))
     labour_list = labour_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', True, False), (1, 4))
+        _detailedSheet, 'MANO DE OBRA', 'SUBTOTAL (N)', True, False), (0, 2))
     materials_list = materials_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Materiales', 'Subtotal de Materiales:', True, False), (1, 2, 4))
+        _detailedSheet, 'MATERIALES', 'SUBTOTAL (O)', True, False), (0, 2, 4))
     transport_list = transport_list + clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Transporte', 'Subtotal de Transporte:', True, False), (1, 2, 4))
+        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL (P)', True, False), (0, 2, 4))
 
     # print(tabulate(equipment_list))
 
@@ -90,26 +90,26 @@ for sheet in tqdm(wb.sheetnames, desc="Segunda vuelta", unit="hoja"):
     # print(_detailedSheet)
 
     _equipment_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Equipo y herramienta', 'Subtotal de Equipo:', True, False), (1, 3, 4))
+        _detailedSheet, 'EQUIPOS', 'SUBTOTAL (M)', True, False), (0, 1, 2))
     _new_equipment_list = transform_tuples(clean_equipment_dict, _equipment_list)
 
     _labour_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Mano de Obra', 'Subtotal de Mano de Obra:', True, False), (1, 3, 4))
+        _detailedSheet, 'MANO DE OBRA', 'SUBTOTAL (N)', True, False), (0, 1, 2))
     _new_labour_list = transform_tuples(clean_labour_dict, _labour_list)
 
     _materials_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Materiales', 'Subtotal de Materiales:', True, False), (1, 2, 3, 4))
+        _detailedSheet, 'MATERIALES', 'SUBTOTAL (O)', True, False), (0, 2, 3, 4))
     _new_materials_list = transform_tuples(clean_materials_dict, _materials_list)
 
     _transport_list = clean_list_tuples(get_tuples_between_tags(
-        _detailedSheet, 'Transporte', 'Subtotal de Transporte:', True, False), (1, 2, 3, 4))
+        _detailedSheet, 'TRANSPORTE', 'SUBTOTAL (P)', True, False), (0, 2, 3, 4))
     _new_transport_list = transform_tuples(clean_transport_dict, _transport_list)
 
     _new_pa = {
         'SHEET': sheet,
-        'ITEM': _detailedSheet[1][1].__str__().strip(),
-        'RUBRO': _detailedSheet[2][1].__str__().strip(),
-        'UNIDAD': _detailedSheet[3][1].__str__().strip(),
+        'ITEM': _detailedSheet[1][1].__str__().strip().replace(" ", ""),
+        'RUBRO': _detailedSheet[3][0].__str__().strip(),
+        'UNIDAD': _detailedSheet[4][1].__str__().strip(),
         'EQUIPO': _new_equipment_list,
         'MANO DE OBRA': _new_labour_list,
         'MATERIALES': _new_materials_list,
@@ -209,5 +209,5 @@ for index, (key, data) in enumerate(dict_data.items(), start=1):
 # # Guardar el libro de Excel
 excel_book.save("output.xlsx")
 
-print(f"\n{GREEN_BOLD}✔ Se ha creado el archivo Excel: output.xlsx{RESET}")
+# print(f"\n{GREEN_BOLD}✔ Se ha creado el archivo Excel: output.xlsx{RESET}")
 print(f"{CYAN_BOLD}⏱ Finalizado en: {(time.time()-tcpu0):.2f} segundos{RESET}\n")
